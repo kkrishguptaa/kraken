@@ -63,7 +63,9 @@ export default function Editor({
     if (!editor) return;
 
     const interval = setInterval(() => {
-      const markdown = (editor.storage as any).markdown.getMarkdown();
+      const markdown = (
+        editor.storage as { markdown: { getMarkdown: () => string } }
+      ).markdown.getMarkdown();
       onSave?.(markdown);
     }, 30000); // 30 seconds
 
@@ -76,7 +78,9 @@ export default function Editor({
 
   const handleManualSave = async () => {
     setIsSaving(true);
-    const markdown = (editor.storage as any).markdown.getMarkdown();
+    const markdown = (
+      editor.storage as { markdown: { getMarkdown: () => string } }
+    ).markdown.getMarkdown();
     await onSave?.(markdown);
     setTimeout(() => setIsSaving(false), 1000);
   };
@@ -91,7 +95,9 @@ export default function Editor({
     }
 
     setIsPublishing(true);
-    const markdown = (editor.storage as any).markdown.getMarkdown();
+    const markdown = (
+      editor.storage as { markdown: { getMarkdown: () => string } }
+    ).markdown.getMarkdown();
     await onSave?.(markdown);
     await onPublish?.();
     setIsPublishing(false);
