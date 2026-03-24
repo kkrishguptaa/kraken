@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "skills": {
+    "add-educational-comments": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "65f6defd9f7da4af496d3c706839d2f48da6761b5eb1bb21ffc7f7aa35288670"
+    },
+    "agent-browser": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "87c60df770d3fbf9f8c0cde8f37cadca24c1445fee90cc3b24f774f4f95f1d01"
+    },
+    "auth": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "dfca893379432c0216976e19cfd0888c00f8dc83ca6a24ebf9c30212789cb27e"
+    },
+    "bootstrap": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "e8d80b9ffe5f53c517faf4c4dc6836936a5eb8405a418bb46264ac99f657ba49"
+    },
+    "chrome-devtools": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "85d9c4ef94e00ddfc937d50aab72a307e80b98bc7e6744ec6e239ef68819c2d7"
+    },
+    "conventional-commit": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "f29c9486cede6c7b2df0cfb0a2e4aa67446552b991bcf17d1b309e903171f03d"
+    },
+    "create-agentsmd": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "bfbdbb76b17cca970d1d624e36ce72b6847860d740581c8865da796c1fef8552"
+    },
+    "create-github-action-workflow-specification": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "527e6c77d921d58a9d0059aa95d0d14b441d2166f9c20518263048a56ca8fbbb"
+    },
+    "create-github-issue-feature-from-specification": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "e4d8019e1a7e43b4ab7023117ec9d3332063fdb923a5cc9f2d42159b69cceb04"
+    },
+    "create-github-issues-feature-from-implementation-plan": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "ff0083bd824eaa94c6e4097abe27f1441694a44feb8d6ea43b51bf3f00b883e1"
+    },
+    "create-github-issues-for-unmet-specification-requirements": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "f44956e909348a20a808bcc2aa56a1b063ff1cc2ae1a1659de6193cff45f59ac"
+    },
+    "create-github-pull-request-from-specification": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2693885db375a1e4a21f66ac69761a86db30911c0a2a9fcb8bac5d9dd05eeb5c"
+    },
+    "create-implementation-plan": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "4764bacd34af8e5c27a85ca01a90197afcf1f1ed1785975ba91d9b80dff60e2d"
+    },
+    "create-readme": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "d0ece1b2164ce1376e4ab6e98d6ac079df3a2a94f5f02224362b6a1ce2516ae9"
+    },
+    "cron-jobs": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "c64436da47a0d874b5a13bd545a8e3f7f4f3ce7136b7c4b788e89c0c70776038"
+    },
+    "deploy-to-vercel": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "d2b5bcc7c09fdb649129ffc7dd7b647ec1b155736974b974292675afd588cb39"
+    },
+    "deployments-cicd": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "2bb940b78c0bcafe59cee91e9a0c98834ad1aab9a328006d5eb06a1bf696a19e"
+    },
+    "doc-coauthoring": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "b964e4c3ffe13f66f76dd7919073e60c7aec622cd8a8363bb36323188100cf8e"
+    },
+    "editorconfig": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "19ce7c1a970666aadccbcbdcf9a37b4675cb7da24f3a5b603ec06ed6d04a0124"
+    },
+    "env-vars": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "8afaa26ba82573de93f099146caa2f568bb65fabe77ce2f24696762671a75100"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "first-ask": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "5131fd3d738563429409476b2e0062d160e81a315d18b42bdd1f5675848bbca5"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "gh-cli": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "cbe644b0c6760ae2a1eaafa39133920d889331327065d92a131675a665273e56"
+    },
+    "github-issues": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "3a752d99ddc3178f443fe242d490800398b2b42030a9d221b298b9486d90cc87"
+    },
+    "investigation-mode": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "e5345e7487c0c2dc0f18291743e35c0cd11a751d4172b2c1283a87cb26da4f01"
+    },
+    "marketplace": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "006887b960eb40aba234ac922ccb7c667a43072799b9bbab3eb5e0892c06e711"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "515ba75178bd44875812d9a560bdf14651f86709f89cf1d4f209638e879807f3"
+    },
+    "next-cache-components": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "b7ea854c2fb1f4e7ad9acddd64bef2ba547bd1955ba4cf211398dff2cce6dc11"
+    },
+    "nextjs": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "228adbce76c9036e79d1177e5b9fe05062569b8aea7effb89152f83f6d4603b2"
+    },
+    "premium-frontend-ui": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2dcc7fe529ddad9b826fcc8ba43fb2357fc2919cc1d1cb5aaa6bcb434d872f9c"
+    },
+    "react-best-practices": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "4f1da6469280a8293e3e46185e9ed5f477e79728bc02028a89ec3f4abf4fa82e"
+    },
+    "remember": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "fdbc1d3eca3219bfbdfca7309036aa78f52ea0ac845c0a1e2fb66284365bc637"
+    },
+    "secret-scanning": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "100aecf1afff20adadfb1af7b74beced4fc91b74dcb52f72cc3862728ae4aeb1"
+    },
+    "shadcn": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "3d7246c8646f37167701c5ac97d1410094a01e5fdd696d2901b7ca90fe99fad8"
+    },
+    "skill-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "b122f4d1e91aa1d83027e050b5b37c3156203ee85458d7b1360bc48167c9e02a"
+    },
+    "turbopack": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "f5369c5efd09055273f89c9ab390dd83f752474ae6a282b0de8dd02e310f51a7"
+    },
+    "vercel-api": {
+      "source": "vercel-labs/vercel-plugin",
+      "sourceType": "github",
+      "computedHash": "d0358d8b2d77e8c98e4176533611100df7830018136b8b34cd3a6c53db81a290"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "f98931159fa9c7fed043bcd18a891a46dcf89ababa38df13a4c5b7b30dc0ce07"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "c858d2d9023e73edb4e5504868cb0e36313e58fd56af12ef888b43c5634a3c17"
+    },
+    "web-artifacts-builder": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "143730c6db11d82d8c5db4d0cf8f435421983f1fc510b24f77ee9a0e8bae7704"
+    },
+    "web-coder": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "f26b2845e3b1ccd59ff2158c45fe2872038e27237757e063d3811a1244757074"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "a6a44d5498f7e8f68289902f3dedfc6f38ae0cee1e96527c80724cf27f727c2a"
+    },
+    "web-design-reviewer": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "10c6fad8b4f01dbeae969009d81d6c306c8a96d56077cad9bfe2a73a38f5dcbe"
+    },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "cf8e5916d474886bd67b09691247f43f331523008b7d366064bc607ab42d6302"
+    }
+  }
+}
