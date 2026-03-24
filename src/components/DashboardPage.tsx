@@ -110,7 +110,7 @@ export default function DashboardPage({
                   slug={publication.slug}
                   editionNumber={issue.editionNumber}
                   title={issue.title}
-                  date={new Date(issue.publishedAt as Date).toLocaleDateString(
+                  date={new Date(issue.publishedAt!).toLocaleDateString(
                     "en-US",
                     {
                       month: "long",
