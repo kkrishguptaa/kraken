@@ -90,12 +90,8 @@
           "name": "comments_issue_id_issues_id_fk",
           "tableFrom": "comments",
           "tableTo": "issues",
-          "columnsFrom": [
-            "issue_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["issue_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -174,12 +170,8 @@
           "name": "follows_publication_id_publications_id_fk",
           "tableFrom": "follows",
           "tableTo": "publications",
-          "columnsFrom": [
-            "publication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["publication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -187,10 +179,7 @@
       "compositePrimaryKeys": {
         "follows_pk": {
           "name": "follows_pk",
-          "columns": [
-            "actor_id",
-            "publication_id"
-          ]
+          "columns": ["actor_id", "publication_id"]
         }
       },
       "uniqueConstraints": {},
@@ -314,12 +303,8 @@
           "name": "issues_publication_id_publications_id_fk",
           "tableFrom": "issues",
           "tableTo": "publications",
-          "columnsFrom": [
-            "publication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["publication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -329,10 +314,7 @@
         "issues_publication_id_edition_number_uk": {
           "name": "issues_publication_id_edition_number_uk",
           "nullsNotDistinct": false,
-          "columns": [
-            "publication_id",
-            "edition_number"
-          ]
+          "columns": ["publication_id", "edition_number"]
         }
       },
       "policies": {},
@@ -400,12 +382,8 @@
           "name": "likes_issue_id_issues_id_fk",
           "tableFrom": "likes",
           "tableTo": "issues",
-          "columnsFrom": [
-            "issue_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["issue_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -413,10 +391,7 @@
       "compositePrimaryKeys": {
         "likes_pk": {
           "name": "likes_pk",
-          "columns": [
-            "actor_id",
-            "issue_id"
-          ]
+          "columns": ["actor_id", "issue_id"]
         }
       },
       "uniqueConstraints": {},
@@ -552,16 +527,12 @@
         "publications_slug_unique": {
           "name": "publications_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         },
         "publications_custom_domain_unique": {
           "name": "publications_custom_domain_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "custom_domain"
-          ]
+          "columns": ["custom_domain"]
         }
       },
       "policies": {},
@@ -670,12 +641,8 @@
           "name": "subscribers_publication_id_publications_id_fk",
           "tableFrom": "subscribers",
           "tableTo": "publications",
-          "columnsFrom": [
-            "publication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["publication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -685,17 +652,12 @@
         "subscribers_token_unique": {
           "name": "subscribers_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         },
         "subscribers_publication_id_email_uk": {
           "name": "subscribers_publication_id_email_uk",
           "nullsNotDistinct": false,
-          "columns": [
-            "publication_id",
-            "email"
-          ]
+          "columns": ["publication_id", "email"]
         }
       },
       "policies": {},
@@ -761,12 +723,8 @@
           "name": "templates_publication_id_publications_id_fk",
           "tableFrom": "templates",
           "tableTo": "publications",
-          "columnsFrom": [
-            "publication_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["publication_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -782,10 +740,7 @@
     "public.issue_status": {
       "name": "issue_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "published"
-      ]
+      "values": ["draft", "published"]
     }
   },
   "schemas": {},

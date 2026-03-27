@@ -1,19 +1,27 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/lib/db";
-import { captcha, emailOTP, haveIBeenPwned, lastLoginMethod, magicLink, twoFactor, username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
+import {
+  captcha,
+  emailOTP,
+  haveIBeenPwned,
+  lastLoginMethod,
+  magicLink,
+  twoFactor,
+  username,
+} from "better-auth/plugins";
 import * as schema from "@/db/schema";
+import { db } from "@/lib/db";
 
 export const auth = betterAuth({
   emailAndPassword: {
-    enabled: true
+    enabled: true,
   },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }
+    },
   },
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -23,9 +31,7 @@ export const auth = betterAuth({
     twoFactor(),
     username(),
     magicLink({
-      async sendMagicLink({ email, token, url, metadata }, ctx) {
-
-      },
+      async sendMagicLink({ email, token, url, metadata }, ctx) {},
     }),
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
@@ -39,11 +45,11 @@ export const auth = betterAuth({
       },
     }),
     captcha({
-      provider: 'google-recaptcha',
+      provider: "google-recaptcha",
       secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY!,
     }),
     haveIBeenPwned(),
     lastLoginMethod(),
     nextCookies(), // needs to be last in the plugins array
-  ]
+  ],
 });
