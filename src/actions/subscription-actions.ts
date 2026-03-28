@@ -44,7 +44,7 @@ async function sendSubscriptionEmail(input: {
 
   try {
     if (input.type === "confirmation") {
-      const publicationUrl = `${appUrl}/@${input.publicationUsername}`;
+      const publicationUrl = `${appUrl}/~${input.publicationUsername}`;
       await resend.emails.send({
         from: getFromEmail(),
         to: input.to,
@@ -237,7 +237,7 @@ export async function subscribeToPublication(formData: FormData) {
   revalidatePath("/subscriptions");
   revalidatePath("/");
   revalidatePath("/feed");
-  revalidatePath(`/@${publicationUsername}`);
+  revalidatePath(`/~${publicationUsername}`);
 
   redirectWithStatus(
     returnTo,

@@ -14,7 +14,7 @@ interface PageProps {
   searchParams: Promise<{ subscribe?: string }>;
 }
 
-export default async function PublicIssuePage({
+export default async function PublicationIssuePage({
   params,
   searchParams,
 }: PageProps) {

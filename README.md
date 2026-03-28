@@ -33,18 +33,9 @@ Open `http://localhost:3000` to view the app.
 
 ## Main Routes
 
-- `/` is the landing page. Signed-in users are redirected to `/feed`.
-- `/home` shows the landing page for signed-in users who want to revisit the marketing page.
-- `/feed` shows recent published issues in a feed.
-- `/editorial` is the writer workspace for drafting and publishing issues.
-- `/settings` manages the profile name, publication title, and custom domains.
-- `/subscriptions` manages reader subscriptions and inbox preferences.
-- `/auth/*` contains sign-in, sign-up, email auth, verify-email, onboarding, and auth-state pages.
-- Public publication routes are implemented in both `@` and `~` families. The app currently uses:
-  - `/@username` for the profile-style public view.
-  - `/@username/[editionNumber]` for the profile-style public issue view.
-  - `/~username` for the publication-style view with subscription controls.
-  - `/~username/[editionNumber]` for the publication-style issue view.
+-  - `/@username` for the profile-style public view.
+-  - `/~username` for the publication-style view with subscription controls.
+-  - `/~username/[editionNumber]` for the publication-style issue view.
 
 For a compact route map and notes on the public/domain routing split, see [docs/routes.md](docs/routes.md).
 
@@ -71,7 +62,6 @@ The code currently expects some combination of the following values:
 - `NEXT_PUBLIC_APP_URL`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_RECAPTCHA_SECRET_KEY`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
 - `VERCEL_API_TOKEN`

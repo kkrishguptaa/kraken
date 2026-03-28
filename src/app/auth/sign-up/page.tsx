@@ -1,12 +1,12 @@
-import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
+import { AuthCenteredLayout } from "@/components/auth/auth-centered-layout";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function SignUpPage() {
   return (
-    <AuthSplitLayout>
+    <AuthCenteredLayout>
       <SignUpForm />
-    </AuthSplitLayout>
+    </AuthCenteredLayout>
   );
 }

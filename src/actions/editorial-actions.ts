@@ -96,7 +96,7 @@ function revalidateEditorialPaths(
   revalidatePath(`/@${username}`);
   revalidatePath(`/~${username}`);
   if (editionNumber) {
-    revalidatePath(`/@${username}/${editionNumber}`);
+    revalidatePath(`/~${username}/${editionNumber}`);
   }
 }
 
@@ -302,7 +302,7 @@ export async function publishEditorialIssue(input: {
 
     if (activeSubscribers.length > 0) {
       const appUrl = getAppUrl();
-      const issueUrl = `${appUrl}/@${username}/${published.editionNumber}`;
+      const issueUrl = `${appUrl}/~${username}/${published.editionNumber}`;
 
       for (const subscriber of activeSubscribers) {
         const unsubscribeUrl = `${appUrl}/api/subscriptions/unsubscribe/${subscriber.token}`;
@@ -367,7 +367,7 @@ export async function testSendIssueEmail(input: {
   const publicationName =
     publication?.name || session.user.name || username || "KRAKEN";
   const appUrl = getAppUrl();
-  const issueUrl = `${appUrl}/@${username}`;
+  const issueUrl = `${appUrl}/~${username}`;
 
   await resend.emails.send({
     from: getFromEmail(),

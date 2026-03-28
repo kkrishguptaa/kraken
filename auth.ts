@@ -2,7 +2,6 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import {
-  captcha,
   emailOTP,
   haveIBeenPwned,
   lastLoginMethod,
@@ -74,10 +73,6 @@ export const auth = betterAuth({
           }),
         });
       },
-    }),
-    captcha({
-      provider: "google-recaptcha",
-      secretKey: getEnv("GOOGLE_RECAPTCHA_SECRET_KEY"),
     }),
     haveIBeenPwned(),
     lastLoginMethod(),

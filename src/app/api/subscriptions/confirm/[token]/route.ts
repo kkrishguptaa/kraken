@@ -38,7 +38,7 @@ export async function GET(
 
   if (subscriber.publicationUsername) {
     return NextResponse.redirect(
-      `${appUrl}/@${subscriber.publicationUsername}?subscribe=subscribed`,
+      `${appUrl}/~${subscriber.publicationUsername}?subscribe=subscribed`,
     );
   }
 

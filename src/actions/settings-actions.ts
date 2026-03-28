@@ -56,7 +56,7 @@ export async function updateDisplayName(formData: FormData) {
     .where(eq(user.id, session.user.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/~${session.user.username}`);
+  revalidatePath(`/@${session.user.username}`);
   toSettingsRedirect("name-updated");
 }
 
@@ -80,7 +80,7 @@ export async function updatePublicationTitle(formData: FormData) {
     .where(eq(publications.id, publication.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/@${session.user.username}`);
+  revalidatePath(`/~${session.user.username}`);
   toSettingsRedirect("publication-title-updated");
 }
 

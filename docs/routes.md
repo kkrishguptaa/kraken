@@ -27,7 +27,6 @@ This page is a quick reference for the route structure that exists in the curren
 The app currently exposes both `@` and `~` route families.
 
 - `/@username` is the profile-style public view.
-- `/@username/[editionNumber]` is the profile-style public issue view.
 - `/~username` is the publication-style view with subscription controls.
 - `/~username/[editionNumber]` is the publication-style issue view.
 

@@ -56,7 +56,7 @@ export function PublicationIssueView({
             userUsername={session?.user?.username}
             showAvatar={!!session}
             title={publicationTitle}
-            linkTo={`/@${username}`}
+            linkTo={`/~${username}`}
             date={publishedDate}
             className="mb-8"
           />
@@ -115,7 +115,7 @@ export function PublicationIssueView({
                 isAuthenticated={!!session}
                 isOwnPublication={isOwnPublication}
                 isSubscribed={isSubscribed}
-                returnTo={`/@${username}`}
+                returnTo={`/~${username}`}
                 status={subscribe}
               />
             </aside>

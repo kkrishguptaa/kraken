@@ -34,7 +34,7 @@ export default async function FeedPage() {
               return (
                 <Link
                   key={article.id}
-                  href={`/@${article.userUsername}/${article.editionNumber}`}
+                  href={`/~${article.userUsername}/${article.editionNumber}`}
                   className={`${gridClasses} group h-full`}
                 >
                   <ArticleCard article={article} size={size} />

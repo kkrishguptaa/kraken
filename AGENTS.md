@@ -103,14 +103,14 @@ These are the implemented routes. Prefer matching them unless the task explicitl
 - `/settings` manages profile, publication title, and custom domains.
 - `/subscriptions` manages reader subscriptions.
 - `/auth/*` contains sign-in, sign-up, email auth, verify-email, onboarding, and auth state pages.
-- Public publication URLs are `@` routes: `/@username`
-- Public issue URLs are `/@username/[editionNumber]`
-- Public profile URLs are `/~username/[editionNumber]`. You should be automatically following all the people you are subscribed too. The `/feed` is for the people you are following. This should be twitter like, showcase articles, subscriptions, follows, likes in tabs.
+- Public profile URLs are `@` routes: `/@username`
+- Public publication URLs are `~` routes: `/~username`
+- Public issue URLs are `/~username/[editionNumber]`. You should be automatically following all the people you are subscribed too. The `/feed` is for the people you are following. This should be twitter like, showcase articles, subscriptions, follows, likes in tabs.
 - `proxy.ts` should rewrite custom vercel domains to their publication. Setup cache for it. Use `@upstash/redis`
 
 # Auth and onboarding conventions
 
-- Better Auth is configured in `auth.ts` with email/password, Google OAuth, email OTP, magic links, captcha, username support, and 2FA-related plugins.
+- Better Auth is configured in `auth.ts` with email/password, Google OAuth, email OTP, magic links, username support, and 2FA-related plugins.
 - The client entrypoint is `src/lib/auth-client.ts`.
 - Session access goes through `src/hooks/session.ts`.
 - Route protection is implemented with async server helpers in `src/hooks/authenticated.ts`, `src/hooks/onboarded.ts`, and `src/hooks/not-onboarded.ts`.
@@ -149,9 +149,10 @@ These are the implemented routes. Prefer matching them unless the task explicitl
 - Follow the current naming and file organization before introducing new abstractions.
 - When editing auth or route behavior, inspect both the page/component layer and the helper/action layer it depends on.
 - When editing public profile or issue rendering, check both:
-  - `src/app/@/[username]/page.tsx`
-  - `src/app/@/[username]/[editionNumber]/page.tsx`
-  - `src/app/~/[username]/page.tsx`
+  - `src/app/@[username]/page.tsx`
+  - `src/app/~[username]/page.tsx`
+  - `src/app/~[username]/[editionNumber]/page.tsx`
+  - Legacy redirect routes under `src/app/@/[username]/**` and `src/app/~/[username]/**`
 - When editing editorial flows, inspect `src/components/editorial/EditorialWorkspace.tsx` and `src/actions/editorial-actions.ts` together.
 - When editing subscriptions or email behavior, inspect both the server actions and the email templates in `src/emails/**`.
 
@@ -173,7 +174,6 @@ Common environment variables inferred from the current code:
 - `BETTER_AUTH_URL`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_RECAPTCHA_SECRET_KEY`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL` or equivalent sender config used by `src/lib/resend.ts`
 - `VERCEL_API_TOKEN`
@@ -199,6 +199,6 @@ When repo-wide drift shows up, prefer fixing the underlying code or automation s
 
 # Product summary
 
-Kraken is a personal publishing platform for staying connected with friends through regular life updates. Share daily notes, weekly letters, or monthly check-ins on your own cadence. Your friends receive them predictably via email or a calm feed, without algorithms deciding who sees what. 
+Kraken is a personal publishing platform for staying connected with friends through regular life updates. Share daily notes, weekly letters, or monthly check-ins on your own cadence. Your friends receive them predictably via email or a calm feed, without algorithms deciding who sees what.
 
 The platform maintains an editorial aesthetic (publications, mastheads, issues) as a design choice, but the tone is personal and intimate—like writing letters to friends rather than performing for an audience. It's social media made calmer, more predictable, and more focused on staying caught up with people you care about than competing for attention in an algorithmic feed.

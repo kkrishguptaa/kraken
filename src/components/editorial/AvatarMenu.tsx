@@ -47,7 +47,7 @@ export function AvatarMenu({
             <Menu.Popup className="min-w-[180px] bg-paper-base border border-paper-border shadow-lg">
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link
-                  href={userUsername ? `/~${userUsername}` : "/profile"}
+                  href={userUsername ? `/@${userUsername}` : "/feed"}
                   className="block w-full"
                 >
                   Profile

@@ -13,12 +13,16 @@ const inputErrorClassName =
 
 type InputProps = {
   error?: boolean;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "className">;
+} & InputHTMLAttributes<HTMLInputElement>;
 
-export function Input({ error = false, ...props }: InputProps) {
+export function Input({ error = false, className, ...props }: InputProps) {
   return (
     <BaseInput
-      className={clsx(inputBaseClassName, error && inputErrorClassName)}
+      className={clsx(
+        inputBaseClassName,
+        error && inputErrorClassName,
+        className,
+      )}
       {...props}
     />
   );

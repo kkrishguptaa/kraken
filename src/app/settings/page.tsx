@@ -99,7 +99,7 @@ export default async function SettingsPage({ searchParams }: PageProps) {
               <div className="text-sm text-paper-muted">
                 @{session.user.username}
               </div>
-              <Button variant="primary" className="text-sm">
+              <Button type="submit" variant="primary" className="text-sm">
                 Save name
               </Button>
             </form>
@@ -112,14 +112,14 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                 Publication title
               </h2>
               <p className="text-sm text-paper-muted">
-                This becomes the masthead title for /@{session.user.username}.
+                This becomes the masthead title for /~{session.user.username}.
               </p>
               <input
                 name="publicationTitle"
                 defaultValue={publication?.name || ""}
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <Button variant="primary" className="text-sm">
+              <Button type="submit" variant="primary" className="text-sm">
                 Save publication title
               </Button>
             </form>
@@ -144,7 +144,7 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                 defaultValue={publication?.customDomain || ""}
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <Button variant="primary" className="text-sm">
+              <Button type="submit" variant="primary" className="text-sm">
                 Add domain
               </Button>
             </form>
@@ -162,7 +162,7 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                     name="customDomain"
                     value={publication.customDomain}
                   />
-                  <Button variant="secondary" className="text-sm">
+                  <Button type="submit" variant="secondary" className="text-sm">
                     Verify domain
                   </Button>
                 </form>
@@ -173,7 +173,7 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                     name="customDomain"
                     value={publication.customDomain}
                   />
-                  <Button variant="danger" className="text-sm">
+                  <Button type="submit" variant="danger" className="text-sm">
                     Remove domain
                   </Button>
                 </form>
@@ -194,10 +194,10 @@ export default async function SettingsPage({ searchParams }: PageProps) {
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-paper-muted">Public publication</span>
               <Link
-                href={`/@${session.user.username}`}
+                href={`/~${session.user.username}`}
                 className="underline underline-offset-4"
               >
-                /@{session.user.username}
+                /~{session.user.username}
               </Link>
             </div>
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">

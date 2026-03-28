@@ -137,6 +137,20 @@ export function EditorialWorkspace({
     });
   }
 
+  async function handleCopyMarkdown() {
+    try {
+      if (!navigator?.clipboard?.writeText) {
+        setNotice("Clipboard is not available in this browser context.");
+        return;
+      }
+
+      await navigator.clipboard.writeText(content);
+      setNotice("Markdown copied.");
+    } catch {
+      setNotice("Could not copy markdown.");
+    }
+  }
+
   function handlePublish() {
     if (!activeIssue) {
       return;
@@ -287,12 +301,15 @@ export function EditorialWorkspace({
             <div data-color-mode="light">
               <MDEditor
                 value={content}
-                onChange={(nextValue) => setContent(nextValue ?? "")}
+                onChange={(nextValue: string | undefined) =>
+                  setContent(nextValue ?? "")
+                }
                 preview="edit"
                 visibleDragbar={false}
                 height={480}
                 textareaProps={{
                   placeholder: "Write your issue here...",
+                  className: "select-text",
                 }}
                 commands={toolbarCommands}
                 extraCommands={[]}
@@ -318,6 +335,15 @@ export function EditorialWorkspace({
                 disabled={isPending}
               >
                 Test send to me
+              </Button>
+
+              <Button
+                variant="secondary"
+                className="text-sm"
+                onClick={handleCopyMarkdown}
+                disabled={isPending}
+              >
+                Copy markdown
               </Button>
 
               {activeIssue.status === "draft" ? (
@@ -358,7 +384,7 @@ export function EditorialWorkspace({
 
               {activeIssue.status === "published" ? (
                 <Link
-                  href={`/@${username}/${activeIssue.editionNumber}`}
+                  href={`/~${username}/${activeIssue.editionNumber}`}
                   className="text-sm underline underline-offset-2"
                 >
                   View published page
