@@ -8,9 +8,16 @@ type AuthSplitLayoutProps = {
   children: ReactNode;
 };
 
-const numberOfPeople = await db.select({ count: count() }).from(user);
+export async function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
+  let numberOfUsers = 0;
+  try {
+    const result = await db.select({ count: count() }).from(user);
+    numberOfUsers = result[0]?.count ?? 0;
+  } catch {
+    // Database unavailable, use default counter
+    numberOfUsers = 0;
+  }
 
-export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   const numberEndings = ["th", "st", "nd", "rd"];
   const getOrdinal = (n: number) => {
     const v = n % 100;
@@ -18,7 +25,7 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
       n + (numberEndings[(v - 20) % 10] || numberEndings[v] || numberEndings[0])
     );
   };
-  const ordinalNumber = getOrdinal(numberOfPeople[0].count + 1);
+  const ordinalNumber = getOrdinal(numberOfUsers + 1);
   return (
     <div className="flex min-h-screen">
       {/* Left side - Form */}

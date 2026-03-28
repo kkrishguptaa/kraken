@@ -15,62 +15,81 @@ interface PageProps {
 export default async function PublicProfilePage({ params }: PageProps) {
   const { username } = await params;
 
-  const profile = await db
-    .select({
-      id: user.id,
-      username: user.username,
-      name: user.name,
-      image: user.image,
-      createdAt: user.createdAt,
-    })
-    .from(user)
-    .where(eq(user.username, username))
-    .then((rows) => rows[0]);
+  let profile;
+  try {
+    profile = await db
+      .select({
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        image: user.image,
+        createdAt: user.createdAt,
+      })
+      .from(user)
+      .where(eq(user.username, username))
+      .then((rows) => rows[0]);
+  } catch {
+    notFound();
+  }
 
   if (!profile) {
     notFound();
   }
 
-  const [publishedCount, followerCount, followingCount, recentIssues] = await Promise.all([
-    db
-      .select({ count: count() })
-      .from(issues)
-      .where(
-        and(
-          eq(issues.userId, profile.id),
-          eq(issues.status, "published"),
-          isNull(issues.deletedAt),
-        ),
-      )
-      .then((rows) => rows[0]?.count ?? 0),
-    db
-      .select({ count: count() })
-      .from(follows)
-      .where(eq(follows.followingId, profile.id))
-      .then((rows) => rows[0]?.count ?? 0),
-    db
-      .select({ count: count() })
-      .from(follows)
-      .where(eq(follows.followerId, profile.id))
-      .then((rows) => rows[0]?.count ?? 0),
-    db
-      .select({
-        id: issues.id,
-        title: issues.title,
-        editionNumber: issues.editionNumber,
-        publishedAt: issues.publishedAt,
-      })
-      .from(issues)
-      .where(
-        and(
-          eq(issues.userId, profile.id),
-          eq(issues.status, "published"),
-          isNull(issues.deletedAt),
-        ),
-      )
-      .orderBy(desc(issues.publishedAt))
-      .limit(12),
-  ]);
+  let publishedCount = 0,
+    followerCount = 0,
+    followingCount = 0,
+    recentIssues: Array<{
+      id: string;
+      title: string;
+      editionNumber: number;
+      publishedAt: string | null;
+    }> = [];
+
+  try {
+    [publishedCount, followerCount, followingCount, recentIssues] = await Promise.all([
+      db
+        .select({ count: count() })
+        .from(issues)
+        .where(
+          and(
+            eq(issues.userId, profile.id),
+            eq(issues.status, "published"),
+            isNull(issues.deletedAt),
+          ),
+        )
+        .then((rows) => rows[0]?.count ?? 0),
+      db
+        .select({ count: count() })
+        .from(follows)
+        .where(eq(follows.followingId, profile.id))
+        .then((rows) => rows[0]?.count ?? 0),
+      db
+        .select({ count: count() })
+        .from(follows)
+        .where(eq(follows.followerId, profile.id))
+        .then((rows) => rows[0]?.count ?? 0),
+      db
+        .select({
+          id: issues.id,
+          title: issues.title,
+          editionNumber: issues.editionNumber,
+          publishedAt: issues.publishedAt,
+        })
+        .from(issues)
+        .where(
+          and(
+            eq(issues.userId, profile.id),
+            eq(issues.status, "published"),
+            isNull(issues.deletedAt),
+          ),
+        )
+        .orderBy(desc(issues.publishedAt))
+        .limit(12),
+    ]);
+  } catch {
+    // Database unavailable, use defaults
+  }
 
   const session = await getSession();
 

@@ -3,7 +3,7 @@ import { SignUpForm } from "@/components/auth/sign-up-form";
 
 export const dynamic = "force-dynamic";
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
   return (
     <AuthSplitLayout>
       <SignUpForm />
