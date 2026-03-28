@@ -56,7 +56,8 @@ export async function addProjectDomain(domain: string) {
   const payload = await parseJson<VercelDomainResponse>(response);
 
   if (!response.ok) {
-    const errorMessage = payload?.error?.message || "Failed to add domain on Vercel";
+    const errorMessage =
+      payload?.error?.message || "Failed to add domain on Vercel";
     throw new Error(errorMessage);
   }
 
@@ -83,7 +84,8 @@ export async function verifyProjectDomain(domain: string) {
   const payload = await parseJson<VercelDomainResponse>(response);
 
   if (!response.ok) {
-    const errorMessage = payload?.error?.message || "Failed to verify domain on Vercel";
+    const errorMessage =
+      payload?.error?.message || "Failed to verify domain on Vercel";
     throw new Error(errorMessage);
   }
 
@@ -108,7 +110,8 @@ export async function removeProjectDomain(domain: string) {
 
   if (!response.ok) {
     const payload = await parseJson<VercelDomainResponse>(response);
-    const errorMessage = payload?.error?.message || "Failed to remove domain from Vercel";
+    const errorMessage =
+      payload?.error?.message || "Failed to remove domain from Vercel";
     throw new Error(errorMessage);
   }
 }

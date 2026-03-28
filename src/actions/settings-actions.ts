@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { publications, user } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
+import { normalizeDomain } from "@/lib/utils/domain";
 import {
   addProjectDomain,
   removeProjectDomain,
@@ -14,10 +15,6 @@ import {
 
 function toSettingsRedirect(status: string): never {
   redirect(`/settings?status=${status}`);
-}
-
-function normalizeDomain(raw: string): string {
-  return raw.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
 async function ensurePublication(userId: string, fallbackName: string) {
@@ -90,7 +87,8 @@ export async function updatePublicationTitle(formData: FormData) {
 export async function addCustomDomain(formData: FormData) {
   const session = await useOnboarded();
   const rawDomain = formData.get("customDomain");
-  const domain = typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
+  const domain =
+    typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
 
   if (!domain) {
     toSettingsRedirect("invalid-domain");
@@ -114,7 +112,9 @@ export async function addCustomDomain(formData: FormData) {
       .where(eq(publications.id, publication.id));
 
     revalidatePath("/settings");
-    toSettingsRedirect(result.verified ? "domain-added" : "domain-pending-verification");
+    toSettingsRedirect(
+      result.verified ? "domain-added" : "domain-pending-verification",
+    );
   } catch {
     toSettingsRedirect("domain-add-failed");
   }
@@ -123,7 +123,8 @@ export async function addCustomDomain(formData: FormData) {
 export async function verifyCustomDomain(formData: FormData) {
   const session = await useOnboarded();
   const rawDomain = formData.get("customDomain");
-  const domain = typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
+  const domain =
+    typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
 
   if (!domain) {
     toSettingsRedirect("invalid-domain");
@@ -139,10 +140,17 @@ export async function verifyCustomDomain(formData: FormData) {
         customDomainVerified: result.verified,
         updatedAt: new Date(),
       })
-      .where(and(eq(publications.userId, session.user.id), eq(publications.customDomain, domain)));
+      .where(
+        and(
+          eq(publications.userId, session.user.id),
+          eq(publications.customDomain, domain),
+        ),
+      );
 
     revalidatePath("/settings");
-    toSettingsRedirect(result.verified ? "domain-verified" : "domain-pending-verification");
+    toSettingsRedirect(
+      result.verified ? "domain-verified" : "domain-pending-verification",
+    );
   } catch {
     toSettingsRedirect("domain-verify-failed");
   }
@@ -151,7 +159,8 @@ export async function verifyCustomDomain(formData: FormData) {
 export async function removeCustomDomain(formData: FormData) {
   const session = await useOnboarded();
   const rawDomain = formData.get("customDomain");
-  const domain = typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
+  const domain =
+    typeof rawDomain === "string" ? normalizeDomain(rawDomain) : "";
 
   if (!domain) {
     toSettingsRedirect("invalid-domain");
@@ -170,7 +179,12 @@ export async function removeCustomDomain(formData: FormData) {
       customDomainVerified: false,
       updatedAt: new Date(),
     })
-    .where(and(eq(publications.userId, session.user.id), eq(publications.customDomain, domain)));
+    .where(
+      and(
+        eq(publications.userId, session.user.id),
+        eq(publications.customDomain, domain),
+      ),
+    );
 
   revalidatePath("/settings");
   toSettingsRedirect("domain-removed");

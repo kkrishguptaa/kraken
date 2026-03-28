@@ -15,6 +15,7 @@ import * as schema from "@/db/schema";
 import { AuthMagicLinkEmail } from "@/emails/auth-magic-link-email";
 import { AuthOtpEmail } from "@/emails/auth-otp-email";
 import { db } from "@/lib/db";
+import { getEnv } from "@/lib/env";
 import { getFromEmail, getResendClient } from "@/lib/resend";
 
 export const auth = betterAuth({
@@ -23,8 +24,8 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: getEnv("GOOGLE_CLIENT_ID"),
+      clientSecret: getEnv("GOOGLE_CLIENT_SECRET"),
     },
   },
   database: drizzleAdapter(db, {
@@ -44,7 +45,7 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: getFromEmail(),
           to: email,
-          subject: "Sign in to Kraken",
+          subject: "Your Kraken sign-in link",
           react: jsx(AuthMagicLinkEmail, {
             url,
           }),
@@ -63,10 +64,10 @@ export const auth = betterAuth({
           to: email,
           subject:
             type === "email-verification"
-              ? "Verify your email"
+              ? "Verify your Kraken email"
               : type === "sign-in"
-                ? "Your sign in code"
-                : "Your verification code",
+                ? "Your Kraken sign-in code"
+                : "Your Kraken verification code",
           react: jsx(AuthOtpEmail, {
             otp,
             type,
@@ -76,7 +77,7 @@ export const auth = betterAuth({
     }),
     captcha({
       provider: "google-recaptcha",
-      secretKey: process.env.GOOGLE_RECAPTCHA_SECRET_KEY!,
+      secretKey: getEnv("GOOGLE_RECAPTCHA_SECRET_KEY"),
     }),
     haveIBeenPwned(),
     lastLoginMethod(),

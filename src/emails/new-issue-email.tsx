@@ -1,15 +1,5 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
+import { Link, Section, Text } from "@react-email/components";
+import { EmailShell, emailStyles } from "@/emails/components/email-shell";
 
 type NewIssueEmailProps = {
   publicationName: string;
@@ -26,100 +16,55 @@ export function NewIssueEmail({
   issueContent,
   unsubscribeUrl,
 }: NewIssueEmailProps) {
-  // Escape HTML in content to prevent injection
-  const sanitizedContent = issueContent.replace(/[<>]/g, (char) =>
-    char === '<' ? '&lt;' : '&gt;'
-  );
+  const content =
+    issueContent.trim() || "Open the web edition to read this issue.";
 
   return (
-    <Html>
-      <Head />
-      <Preview>New issue from {publicationName}</Preview>
-      <Body style={styles.body}>
-        <Container style={styles.container}>
-          <Text style={styles.eyebrow}>{publicationName}</Text>
-          <Heading style={styles.heading}>{issueTitle}</Heading>
-          <Text style={styles.copy}>{sanitizedContent}</Text>
-
-          <Section style={styles.buttonWrap}>
-            <Button href={issueUrl} style={styles.button}>
-              Read this issue
-            </Button>
-          </Section>
-
-          <Hr style={styles.hr} />
-          <Text style={styles.footer}>
+    <EmailShell
+      preview={`New issue from ${publicationName}: ${issueTitle}`}
+      eyebrow={publicationName}
+      title={issueTitle}
+      intro={
+        <Text style={emailStyles.copy}>
+          A new edition has been published and is ready to read on Kraken.
+        </Text>
+      }
+      action={{ href: issueUrl, label: "Read On Kraken" }}
+      footer={
+        <>
+          <Text style={emailStyles.muted}>
             You are receiving this because you subscribed to {publicationName}.
           </Text>
-          <Text style={styles.footer}>
-            <a href={unsubscribeUrl} style={styles.link}>
-              Unsubscribe from this publication
-            </a>
-          </Text>
-        </Container>
-      </Body>
-    </Html>
+          <Link href={unsubscribeUrl} style={styles.link}>
+            Unsubscribe from this publication
+          </Link>
+        </>
+      }
+    >
+      <Section style={styles.issueCard}>
+        <Text style={styles.issueCopy}>{content}</Text>
+      </Section>
+    </EmailShell>
   );
 }
 
 const styles = {
-  body: {
+  issueCard: {
     backgroundColor: "#f6f1e7",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    color: "#16120f",
-    margin: "0",
-    padding: "24px 0",
-  },
-  container: {
-    margin: "0 auto",
-    maxWidth: "600px",
     border: "1px solid #d4cab5",
-    backgroundColor: "#fffdf8",
-    padding: "32px",
+    padding: "20px 22px",
   },
-  eyebrow: {
-    margin: "0 0 14px",
-    color: "#645d52",
-    fontSize: "12px",
-    letterSpacing: "0.1em",
-    textTransform: "uppercase" as const,
-  },
-  heading: {
-    margin: "0 0 14px",
-    fontSize: "30px",
-    fontWeight: "500",
-    lineHeight: "1.15",
-  },
-  copy: {
-    margin: "0 0 16px",
+  issueCopy: {
+    margin: "0",
+    color: "#16120f",
     fontSize: "17px",
     lineHeight: "1.75",
     whiteSpace: "pre-wrap" as const,
   },
-  buttonWrap: {
-    margin: "18px 0 16px",
-  },
-  button: {
-    backgroundColor: "#16120f",
-    color: "#f6f1e7",
-    textDecoration: "none",
-    padding: "11px 16px",
-    fontSize: "12px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
-  },
-  hr: {
-    borderColor: "#d4cab5",
-    margin: "20px 0",
-  },
-  footer: {
-    margin: "0 0 6px",
-    fontSize: "13px",
-    color: "#645d52",
-    lineHeight: "1.5",
-  },
   link: {
     color: "#16120f",
+    fontSize: "13px",
+    lineHeight: "1.6",
     textDecoration: "underline",
   },
-};
+} as const;

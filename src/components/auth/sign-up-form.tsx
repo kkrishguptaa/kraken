@@ -6,8 +6,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { signUpWithEmail } from "@/actions/auth-actions";
-import { GoogleButton } from "@/components/auth/google-button";
+import {
+  sendEmailVerificationOTP,
+  signUpWithEmail,
+} from "@/actions/auth-actions";
+import { AuthEntryOptions } from "@/components/auth/auth-entry-options";
+import { AuthField } from "@/components/auth/auth-field";
+import {
+  authPrimaryButtonClassName,
+  getAuthInputClassName,
+} from "@/components/auth/auth-styles";
 
 type SignUpFormValues = {
   name: string;
@@ -47,49 +55,17 @@ export function SignUpForm() {
       </div>
 
       <div className="space-y-4">
-        {/* Google Button */}
-        <GoogleButton
-          label="Continue with Google"
-          className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-        />
-
-        {/* Email OTP and Magic Link buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            type="button"
-            onClick={() => router.push("/auth/email")}
-            className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-          >
-            Email OTP
-          </Button>
-          <Button
-            type="button"
-            onClick={() => router.push("/auth/email")}
-            className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-          >
-            Magic Link
-          </Button>
-        </div>
-
-        {/* Separator */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-paper-border" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-paper-base px-2 text-paper-muted">
-              or sign up with email
-            </span>
-          </div>
-        </div>
+        <AuthEntryOptions separatorLabel="or sign up with email" />
 
         {/* Form */}
         <form
           className="space-y-4"
           onSubmit={handleSubmit(async (values) => {
             clearErrors();
+            const email = values.email.trim().toLowerCase();
             const result = await signUpWithEmail({
               ...values,
+              email,
               username: values.username.trim().toLowerCase(),
             });
 
@@ -101,121 +77,74 @@ export function SignUpForm() {
               return;
             }
 
+            const verifyResult = await sendEmailVerificationOTP(email);
             router.push(
-              `/auth/verify-email?email=${encodeURIComponent(values.email)}`,
+              `/auth/verify-email?email=${encodeURIComponent(email)}&flow=email-verification&method=otp${verifyResult.ok ? "" : "&notice=send-failed"}`,
             );
             router.refresh();
           })}
         >
           {/* Name field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Full name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Krish Garg"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.name
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("name", {
-                required: "Name is required.",
-                minLength: {
-                  value: 2,
-                  message: "Name must be at least 2 characters.",
-                },
-              })}
-            />
-            {errors.name?.message ? (
-              <p className="text-xs text-red-700">{errors.name.message}</p>
-            ) : null}
-          </div>
+          <AuthField
+            id="name"
+            label="Full name"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            error={errors.name?.message}
+            type="text"
+            autoComplete="name"
+            placeholder="Krish Garg"
+            className="placeholder:text-paper-muted/50"
+            {...register("name", {
+              required: "Name is required.",
+              minLength: {
+                value: 2,
+                message: "Name must be at least 2 characters.",
+              },
+            })}
+          />
 
           {/* Username field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="username"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Username
-            </label>
-            <Input
-              id="username"
-              type="text"
-              autoComplete="username"
-              placeholder="krishg"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.username
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("username", {
-                required: "Username is required.",
-                pattern: {
-                  value: /^[a-zA-Z0-9_]+$/,
-                  message: "Use letters, numbers, or underscores only.",
-                },
-                minLength: {
-                  value: 3,
-                  message: "Username must be at least 3 characters.",
-                },
-              })}
-            />
-            {errors.username?.message ? (
-              <p className="text-xs text-red-700">{errors.username.message}</p>
-            ) : (
-              <p className="text-xs text-paper-muted">
-                This becomes your public profile identifier.
-              </p>
-            )}
-          </div>
+          <AuthField
+            id="username"
+            label="Username"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            error={errors.username?.message}
+            hint="This becomes your public profile identifier."
+            type="text"
+            autoComplete="username"
+            placeholder="krishg"
+            className="placeholder:text-paper-muted/50"
+            {...register("username", {
+              required: "Username is required.",
+              pattern: {
+                value: /^[a-zA-Z0-9_]+$/,
+                message: "Use letters, numbers, or underscores only.",
+              },
+              minLength: {
+                value: 3,
+                message: "Username must be at least 3 characters.",
+              },
+            })}
+          />
 
           {/* Email field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="krish@krishg.com"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.email
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("email", {
-                required: "Email is required.",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address.",
-                },
-              })}
-            />
-            {errors.email?.message ? (
-              <p className="text-xs text-red-700">{errors.email.message}</p>
-            ) : null}
-          </div>
+          <AuthField
+            id="email"
+            label="Email"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            error={errors.email?.message}
+            type="email"
+            autoComplete="email"
+            placeholder="krish@krishg.com"
+            className="placeholder:text-paper-muted/50"
+            {...register("email", {
+              required: "Email is required.",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address.",
+              },
+            })}
+          />
 
           {/* Password field */}
           <div className="space-y-2">
@@ -230,14 +159,10 @@ export function SignUpForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
-                className={[
-                  "w-full cursor-text border bg-white px-3 py-2 pr-16 text-sm outline-none transition",
-                  "border-paper-border text-paper-ink",
-                  "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                  errors.password
-                    ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                    : "",
-                ].join(" ")}
+                className={getAuthInputClassName({
+                  invalid: Boolean(errors.password),
+                  className: "pr-16",
+                })}
                 {...register("password", {
                   required: "Password is required.",
                   minLength: {
@@ -267,7 +192,7 @@ export function SignUpForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-3 text-sm font-medium text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            className={authPrimaryButtonClassName}
           >
             {isSubmitting ? "Creating account..." : "Create Account"}
           </Button>

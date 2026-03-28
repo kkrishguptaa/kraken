@@ -1,10 +1,10 @@
 import { and, desc, eq } from "drizzle-orm";
-import { Masthead } from "@/components/editorial";
 import {
   removeSubscription,
   subscribeToPublication,
   updateSubscriptionNotifications,
 } from "@/actions/subscription-actions";
+import { Masthead } from "@/components/editorial";
 import { publications, subscribers, user } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
@@ -17,6 +17,8 @@ const statusCopy: Record<string, string> = {
   updated: "Subscription preferences updated.",
   removed: "Subscription removed.",
   unsubscribed: "Email notifications disabled from your unsubscribe link.",
+  "email-unavailable":
+    "We saved the subscription, but email delivery is unavailable right now. Try again in a moment.",
   "publication-not-found": "We could not find that publication username.",
   "missing-publication": "Please enter a publication username.",
   "missing-email": "Please enter a valid email address.",

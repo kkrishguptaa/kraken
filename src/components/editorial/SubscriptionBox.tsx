@@ -22,7 +22,10 @@ export function SubscriptionBox({
 }: SubscriptionBoxProps) {
   const noticeMap: Record<string, string> = {
     subscribed: "Subscription confirmed. Check your inbox.",
-    "check-email": "Check your inbox and confirm to activate your subscription.",
+    "check-email":
+      "Check your inbox and confirm to activate your subscription.",
+    "email-unavailable":
+      "Subscription saved, but email delivery is unavailable right now. Try again shortly.",
     "missing-email": "Enter a valid email to subscribe.",
     "publication-not-found": "Publication not found.",
     "missing-publication": "Missing publication username.",
@@ -53,7 +56,10 @@ export function SubscriptionBox({
 
         {!isOwnPublication && !isAuthenticated ? (
           <div className="space-y-3">
-            <form action={subscribeToPublication} className="flex flex-col gap-3 sm:flex-row">
+            <form
+              action={subscribeToPublication}
+              className="flex flex-col gap-3 sm:flex-row"
+            >
               <input
                 type="hidden"
                 name="publicationUsername"
@@ -76,7 +82,10 @@ export function SubscriptionBox({
             </form>
             <p className="text-meta-small text-paper-muted">
               Already have an account?{" "}
-              <Link href="/auth/sign-in" className="underline underline-offset-2">
+              <Link
+                href="/auth/sign-in"
+                className="underline underline-offset-2"
+              >
                 Sign in
               </Link>
             </p>

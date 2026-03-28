@@ -1,11 +1,13 @@
 import { Input } from "@base-ui/react/input";
 import type { InputHTMLAttributes } from "react";
+import { getAuthInputClassName } from "@/components/auth/auth-styles";
 
 type AuthFieldProps = {
   id: string;
   label: string;
   hint?: string;
   error?: string;
+  labelClassName?: string;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "id">;
 
 export function AuthField({
@@ -13,6 +15,7 @@ export function AuthField({
   label,
   hint,
   error,
+  labelClassName,
   className,
   ...props
 }: AuthFieldProps) {
@@ -20,19 +23,19 @@ export function AuthField({
     <div className="space-y-2">
       <label
         htmlFor={id}
-        className="block text-xs uppercase tracking-[0.2em] text-paper-muted"
+        className={
+          labelClassName ??
+          "block text-xs uppercase tracking-[0.2em] text-paper-muted"
+        }
       >
         {label}
       </label>
       <Input
         id={id}
-        className={[
-          "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-          "border-paper-border text-paper-ink",
-          "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-          error ? "border-red-600 focus:border-red-600 focus:ring-red-200" : "",
-          className ?? "",
-        ].join(" ")}
+        className={getAuthInputClassName({
+          invalid: Boolean(error),
+          className,
+        })}
         {...props}
       />
       {error ? <p className="text-xs text-red-700">{error}</p> : null}

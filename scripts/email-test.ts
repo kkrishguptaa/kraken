@@ -8,8 +8,8 @@ import { SubscriptionOptInEmail } from "@/emails/subscription-opt-in-email";
 import { getAppUrl, getFromEmail, getResendClient } from "@/lib/resend";
 
 dotenv.config({
-  path: process.cwd() + "/.env.local",
-})
+  path: `${process.cwd()}/.env.local`,
+});
 
 async function run() {
   const resend = getResendClient();
@@ -20,7 +20,9 @@ async function run() {
   }
 
   if (!to) {
-    throw new Error("Set TEST_EMAIL_TO in your environment to run email tests.");
+    throw new Error(
+      "Set TEST_EMAIL_TO in your environment to run email tests.",
+    );
   }
 
   const appUrl = getAppUrl();

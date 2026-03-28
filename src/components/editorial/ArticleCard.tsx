@@ -58,7 +58,6 @@ export function ArticleCard({
           {article.content}
         </MarkdownRender>
       </div>
-
     </article>
   );
 }

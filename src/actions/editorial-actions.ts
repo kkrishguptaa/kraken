@@ -3,9 +3,14 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { jsx } from "react/jsx-runtime";
-import { issueDeliveries, issues, publications, subscribers } from "@/db/schema";
+import {
+  issueDeliveries,
+  issues,
+  publications,
+  subscribers,
+} from "@/db/schema";
 import { NewIssueEmail } from "@/emails/new-issue-email";
-import { useAuthenticated } from "@/hooks/authenticated";
+import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
 import { getAppUrl, getFromEmail, getResendClient } from "@/lib/resend";
 
@@ -19,6 +24,18 @@ export type EditorialIssueRecord = {
   publishedAt: Date | null;
 };
 
+function getRequiredUsername(session: {
+  user: { username?: string | null };
+}): string {
+  const username = session.user.username;
+
+  if (!username) {
+    throw new Error("Onboarded user is missing a username");
+  }
+
+  return username;
+}
+
 async function getPublicationId(userId: string) {
   const publication = await db
     .select({ id: publications.id })
@@ -27,6 +44,26 @@ async function getPublicationId(userId: string) {
     .then((rows) => rows[0]);
 
   return publication?.id;
+}
+
+async function ensurePublication(userId: string, fallbackName: string) {
+  const existingPublicationId = await getPublicationId(userId);
+
+  if (existingPublicationId) {
+    return existingPublicationId;
+  }
+
+  const created = await db
+    .insert(publications)
+    .values({
+      userId,
+      name: fallbackName,
+      updatedAt: new Date(),
+    })
+    .returning({ id: publications.id })
+    .then((rows) => rows[0]);
+
+  return created.id;
 }
 
 function mapIssueRecord(row: {
@@ -49,16 +86,27 @@ function mapIssueRecord(row: {
   };
 }
 
-function revalidateEditorialPaths(username: string) {
+function revalidateEditorialPaths(
+  username: string,
+  editionNumber?: number | null,
+) {
   revalidatePath("/");
   revalidatePath("/feed");
   revalidatePath("/editorial");
   revalidatePath(`/@${username}`);
   revalidatePath(`/~${username}`);
+  if (editionNumber) {
+    revalidatePath(`/@${username}/${editionNumber}`);
+  }
 }
 
 export async function createEditorialDraft(): Promise<EditorialIssueRecord> {
-  const session = await useAuthenticated();
+  const session = await useOnboarded();
+  const username = getRequiredUsername(session);
+  const publicationId = await ensurePublication(
+    session.user.id,
+    `${session.user.name || username} Publication`,
+  );
 
   const highestEdition = await db
     .select({ editionNumber: issues.editionNumber })
@@ -68,7 +116,6 @@ export async function createEditorialDraft(): Promise<EditorialIssueRecord> {
     .limit(1)
     .then((rows) => rows[0]);
 
-  const publicationId = await getPublicationId(session.user.id);
   const nextEditionNumber = (highestEdition?.editionNumber ?? 0) + 1;
 
   const created = await db
@@ -93,7 +140,7 @@ export async function createEditorialDraft(): Promise<EditorialIssueRecord> {
     })
     .then((rows) => rows[0]);
 
-  revalidateEditorialPaths(session.user.username || "");
+  revalidateEditorialPaths(username);
 
   return mapIssueRecord(created);
 }
@@ -103,7 +150,8 @@ export async function saveEditorialIssue(input: {
   title: string;
   content: string;
 }): Promise<EditorialIssueRecord> {
-  const session = await useAuthenticated();
+  const session = await useOnboarded();
+  const username = getRequiredUsername(session);
 
   const updated = await db
     .update(issues)
@@ -134,7 +182,10 @@ export async function saveEditorialIssue(input: {
     throw new Error("Issue not found");
   }
 
-  revalidateEditorialPaths(session.user.username || "");
+  revalidateEditorialPaths(
+    username,
+    updated.status === "published" ? updated.editionNumber : null,
+  );
 
   return mapIssueRecord(updated);
 }
@@ -144,7 +195,8 @@ export async function publishEditorialIssue(input: {
   title: string;
   content: string;
 }): Promise<EditorialIssueRecord> {
-  const session = await useAuthenticated();
+  const session = await useOnboarded();
+  const username = getRequiredUsername(session);
 
   // Verify issue exists and belongs to user
   const existingIssue = await db
@@ -160,10 +212,15 @@ export async function publishEditorialIssue(input: {
     .then((rows) => rows[0]);
 
   if (!existingIssue) {
-    throw new Error("Issue not found or you do not have permission to publish it");
+    throw new Error(
+      "Issue not found or you do not have permission to publish it",
+    );
   }
 
-  const publicationId = await getPublicationId(session.user.id);
+  const publicationId = await ensurePublication(
+    session.user.id,
+    `${session.user.name || username} Publication`,
+  );
 
   const published = await db
     .update(issues)
@@ -198,7 +255,6 @@ export async function publishEditorialIssue(input: {
   }
 
   const resend = getResendClient();
-  const username = session.user.username;
   const publication = publicationId
     ? await db
         .select({ name: publications.name })
@@ -206,7 +262,8 @@ export async function publishEditorialIssue(input: {
         .where(eq(publications.id, publicationId))
         .then((rows) => rows[0])
     : null;
-  const publicationName = publication?.name || session.user.name || username || "KRAKEN";
+  const publicationName =
+    publication?.name || session.user.name || username || "KRAKEN";
 
   if (resend && publicationId && username) {
     const activeSubscribers = await db
@@ -263,7 +320,7 @@ export async function publishEditorialIssue(input: {
     }
   }
 
-  revalidateEditorialPaths(session.user.username || "");
+  revalidateEditorialPaths(username, published.editionNumber);
 
   return mapIssueRecord(published);
 }
@@ -273,7 +330,8 @@ export async function testSendIssueEmail(input: {
   title: string;
   content: string;
 }) {
-  const session = await useAuthenticated();
+  const session = await useOnboarded();
+  const username = getRequiredUsername(session);
   const resend = getResendClient();
 
   if (!resend || !session.user.email) {
@@ -287,11 +345,9 @@ export async function testSendIssueEmail(input: {
     .then((rows) => rows[0]);
 
   const publicationName =
-    publication?.name || session.user.name || session.user.username || "KRAKEN";
+    publication?.name || session.user.name || username || "KRAKEN";
   const appUrl = getAppUrl();
-  const issueUrl = session.user.username
-    ? `${appUrl}/@${session.user.username}`
-    : appUrl;
+  const issueUrl = `${appUrl}/@${username}`;
 
   await resend.emails.send({
     from: getFromEmail(),
@@ -302,7 +358,7 @@ export async function testSendIssueEmail(input: {
       issueTitle: input.title,
       issueUrl,
       issueContent: input.content,
-      unsubscribeUrl: `${appUrl}/settings`,
+      unsubscribeUrl: `${appUrl}/subscriptions`,
     }),
   });
 }

@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import MDEditor, { commands } from "@uiw/react-md-editor";
+import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import {
   createEditorialDraft,
+  type EditorialIssueRecord,
   publishEditorialIssue,
   saveEditorialIssue,
   testSendIssueEmail,
-  type EditorialIssueRecord,
 } from "@/actions/editorial-actions";
 
 type EditorialWorkspaceProps = {
@@ -27,7 +27,10 @@ function formatStamp(value: Date | null): string {
   }).format(value);
 }
 
-export function EditorialWorkspace({ username, initialIssues }: EditorialWorkspaceProps) {
+export function EditorialWorkspace({
+  username,
+  initialIssues,
+}: EditorialWorkspaceProps) {
   const [issues, setIssues] = useState(initialIssues);
   const [activeIssueId, setActiveIssueId] = useState<string | null>(
     initialIssues[0]?.id ?? null,
@@ -296,7 +299,9 @@ export function EditorialWorkspace({ username, initialIssues }: EditorialWorkspa
                   Publish issue
                 </button>
               ) : (
-                <span className="text-meta-small text-paper-muted">Published</span>
+                <span className="text-meta-small text-paper-muted">
+                  Published
+                </span>
               )}
 
               {activeIssue.status === "published" ? (
@@ -309,7 +314,9 @@ export function EditorialWorkspace({ username, initialIssues }: EditorialWorkspa
               ) : null}
 
               {notice ? (
-                <p className="ml-auto text-meta-small text-paper-muted">{notice}</p>
+                <p className="ml-auto text-meta-small text-paper-muted">
+                  {notice}
+                </p>
               ) : null}
             </div>
           </>

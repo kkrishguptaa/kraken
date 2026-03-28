@@ -7,7 +7,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { signInWithEmail } from "@/actions/auth-actions";
-import { GoogleButton } from "@/components/auth/google-button";
+import { AuthEntryOptions } from "@/components/auth/auth-entry-options";
+import { AuthField } from "@/components/auth/auth-field";
+import {
+  authPrimaryButtonClassName,
+  getAuthInputClassName,
+} from "@/components/auth/auth-styles";
 
 type SignInFormValues = {
   email: string;
@@ -43,41 +48,7 @@ export function SignInForm() {
       </div>
 
       <div className="space-y-4">
-        {/* Google Button */}
-        <GoogleButton
-          label="Continue with Google"
-          className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-        />
-
-        {/* Email OTP and Magic Link buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            type="button"
-            onClick={() => router.push("/auth/email")}
-            className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-          >
-            Email OTP
-          </Button>
-          <Button
-            type="button"
-            onClick={() => router.push("/auth/email")}
-            className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium transition hover:bg-gray-50"
-          >
-            Magic Link
-          </Button>
-        </div>
-
-        {/* Separator */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-paper-border" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-paper-base px-2 text-paper-muted">
-              or sign in with email
-            </span>
-          </div>
-        </div>
+        <AuthEntryOptions separatorLabel="or sign in with email" />
 
         {/* Form */}
         <form
@@ -94,38 +65,23 @@ export function SignInForm() {
           })}
         >
           {/* Email field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="krish@krishg.com"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.email
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("email", {
-                required: "Email is required.",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address.",
-                },
-              })}
-            />
-            {errors.email?.message ? (
-              <p className="text-xs text-red-700">{errors.email.message}</p>
-            ) : null}
-          </div>
+          <AuthField
+            id="email"
+            label="Email"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            error={errors.email?.message}
+            type="email"
+            autoComplete="email"
+            placeholder="krish@krishg.com"
+            className="placeholder:text-paper-muted/50"
+            {...register("email", {
+              required: "Email is required.",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address.",
+              },
+            })}
+          />
 
           {/* Password field */}
           <div className="space-y-2">
@@ -148,14 +104,10 @@ export function SignInForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
-                className={[
-                  "w-full cursor-text border bg-white px-3 py-2 pr-16 text-sm outline-none transition",
-                  "border-paper-border text-paper-ink",
-                  "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                  errors.password
-                    ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                    : "",
-                ].join(" ")}
+                className={getAuthInputClassName({
+                  invalid: Boolean(errors.password),
+                  className: "pr-16",
+                })}
                 {...register("password", {
                   required: "Password is required.",
                   minLength: {
@@ -185,7 +137,7 @@ export function SignInForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-3 text-sm font-medium text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            className={authPrimaryButtonClassName}
           >
             {isSubmitting ? "Signing in..." : "Sign In"}
           </Button>

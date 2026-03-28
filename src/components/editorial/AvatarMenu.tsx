@@ -25,7 +25,7 @@ export function AvatarMenu({
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: Next.Js doesn't allow buttons inside buttons or something
-<div
+    <div
       className="relative"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}

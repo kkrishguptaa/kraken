@@ -1,6 +1,6 @@
 import { and, desc, eq, isNull } from "drizzle-orm";
-import { EditorialWorkspace } from "@/components/editorial/EditorialWorkspace";
 import { Masthead } from "@/components/editorial";
+import { EditorialWorkspace } from "@/components/editorial/EditorialWorkspace";
 import { issues } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
@@ -33,7 +33,10 @@ export default async function EditorialPage() {
         id: row.id,
         title: row.title,
         content: row.content,
-        status: row.status === "published" ? ("published" as const) : ("draft" as const),
+        status:
+          row.status === "published"
+            ? ("published" as const)
+            : ("draft" as const),
         editionNumber: row.editionNumber,
         updatedAt: row.updatedAt,
         publishedAt: row.publishedAt,
@@ -53,7 +56,10 @@ export default async function EditorialPage() {
           />
         </div>
 
-        <EditorialWorkspace username={username ?? ""} initialIssues={initialIssues} />
+        <EditorialWorkspace
+          username={username ?? ""}
+          initialIssues={initialIssues}
+        />
       </div>
     </main>
   );

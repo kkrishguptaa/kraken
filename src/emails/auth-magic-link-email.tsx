@@ -1,14 +1,5 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Section,
-  Text,
-} from "@react-email/components";
+import { Link, Text } from "@react-email/components";
+import { EmailShell, emailStyles } from "@/emails/components/email-shell";
 
 type AuthMagicLinkEmailProps = {
   url: string;
@@ -16,69 +7,46 @@ type AuthMagicLinkEmailProps = {
 
 export function AuthMagicLinkEmail({ url }: AuthMagicLinkEmailProps) {
   return (
-    <Html>
-      <Head />
-      <Preview>Sign in to Kraken</Preview>
-      <Body style={styles.body}>
-        <Container style={styles.container}>
-          <Heading style={styles.heading}>Sign in to Kraken</Heading>
-          <Text style={styles.copy}>
-            Use this secure link to sign in to your Kraken account.
+    <EmailShell
+      preview="Open your secure Kraken sign-in link"
+      eyebrow="Account Access"
+      title="Sign in to Kraken"
+      intro={
+        <Text style={emailStyles.copy}>
+          Use the secure link below to continue into your account. It expires
+          soon and can only be used once.
+        </Text>
+      }
+      action={{ href: url, label: "Open Sign-In Link" }}
+      footer={
+        <>
+          <Text style={styles.footerText}>
+            If you did not request this sign-in, you can safely ignore this
+            email.
           </Text>
-          <Section style={styles.buttonWrap}>
-            <Button href={url} style={styles.button}>
-              Sign in
-            </Button>
-          </Section>
-          <Text style={styles.footer}>If you did not request this, you can ignore this email.</Text>
-        </Container>
-      </Body>
-    </Html>
+          <Text style={styles.footerText}>
+            If the button does not open, copy this link into your browser:
+          </Text>
+          <Link href={url} style={styles.link}>
+            {url}
+          </Link>
+        </>
+      }
+    />
   );
 }
 
 const styles = {
-  body: {
-    backgroundColor: "#f6f1e7",
-    fontFamily: "Georgia, 'Times New Roman', serif",
-    color: "#16120f",
-    margin: "0",
-    padding: "24px 0",
-  },
-  container: {
-    margin: "0 auto",
-    maxWidth: "600px",
-    border: "1px solid #d4cab5",
-    backgroundColor: "#fffdf8",
-    padding: "32px",
-  },
-  heading: {
-    margin: "0 0 12px",
-    fontSize: "30px",
-    fontWeight: "500",
-    lineHeight: "1.15",
-  },
-  copy: {
+  footerText: {
     margin: "0 0 8px",
-    fontSize: "17px",
-    lineHeight: "1.75",
-  },
-  buttonWrap: {
-    margin: "18px 0 16px",
-  },
-  button: {
-    backgroundColor: "#16120f",
-    color: "#f6f1e7",
-    textDecoration: "none",
-    padding: "11px 16px",
-    fontSize: "12px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
-  },
-  footer: {
-    margin: "0",
     fontSize: "13px",
     color: "#645d52",
-    lineHeight: "1.5",
+    lineHeight: "1.6",
   },
-};
+  link: {
+    color: "#16120f",
+    fontSize: "13px",
+    lineHeight: "1.6",
+    textDecoration: "underline",
+  },
+} as const;

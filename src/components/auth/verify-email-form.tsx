@@ -4,7 +4,17 @@ import { Button } from "@base-ui/react/button";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import { sendSignInOTP, signInWithEmailOTP } from "@/actions/auth-actions";
+import {
+  sendEmailVerificationOTP,
+  sendMagicLink,
+  sendSignInOTP,
+  signInWithEmailOTP,
+  verifyEmailWithOTP,
+} from "@/actions/auth-actions";
+import {
+  authHelpCardClassName,
+  authPrimaryButtonClassName,
+} from "@/components/auth/auth-styles";
 
 export function VerifyEmailForm() {
   const router = useRouter();
@@ -14,8 +24,36 @@ export function VerifyEmailForm() {
   const [isResending, setIsResending] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
+  const otpSlotIds = [
+    "otp-digit-1",
+    "otp-digit-2",
+    "otp-digit-3",
+    "otp-digit-4",
+    "otp-digit-5",
+    "otp-digit-6",
+  ] as const;
 
-  const email = params.get("email") ?? "";
+  const email = params.get("email")?.trim().toLowerCase() ?? "";
+  const notice = params.get("notice");
+  const method = params.get("method") === "magic-link" ? "magic-link" : "otp";
+  const flow =
+    params.get("flow") === "sign-in" ? "sign-in" : "email-verification";
+  const isMagicLink = method === "magic-link";
+  const isEmailVerification = flow === "email-verification";
+  const wrongEmailHref = isEmailVerification ? "/auth/sign-up" : "/auth/email";
+  const title = isMagicLink
+    ? "Check your email"
+    : isEmailVerification
+      ? "Enter the verification code"
+      : "Enter your sign in code";
+  const lead = isMagicLink
+    ? "We sent a secure sign-in link to"
+    : isEmailVerification
+      ? "We sent a 6-digit verification code to"
+      : "We sent a 6-digit sign in code to";
+  const resendSuccessMessage = isMagicLink
+    ? "Fresh magic link sent. Check your inbox."
+    : "Code sent. Check your inbox.";
 
   // Refs for the 6 digit inputs
   const inputRefs = [
@@ -79,7 +117,7 @@ export function VerifyEmailForm() {
   };
 
   const handleResendCode = async () => {
-    if (!email?.trim()) {
+    if (!email) {
       setError("Email is required to resend code.");
       return;
     }
@@ -88,7 +126,11 @@ export function VerifyEmailForm() {
     setMessage(null);
     setError(null);
 
-    const result = await sendSignInOTP(email.trim());
+    const result = isMagicLink
+      ? await sendMagicLink(email)
+      : isEmailVerification
+        ? await sendEmailVerificationOTP(email)
+        : await sendSignInOTP(email);
 
     setIsResending(false);
 
@@ -97,13 +139,17 @@ export function VerifyEmailForm() {
       return;
     }
 
-    setMessage("Code sent! Check your inbox.");
+    setMessage(resendSuccessMessage);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setMessage(null);
+
+    if (isMagicLink) {
+      return;
+    }
 
     const otp = digits.join("");
 
@@ -114,10 +160,15 @@ export function VerifyEmailForm() {
 
     setIsSubmitting(true);
 
-    const result = await signInWithEmailOTP({
-      email,
-      otp,
-    });
+    const result = isEmailVerification
+      ? await verifyEmailWithOTP({
+          email,
+          otp,
+        })
+      : await signInWithEmailOTP({
+          email,
+          otp,
+        });
 
     setIsSubmitting(false);
 
@@ -126,8 +177,12 @@ export function VerifyEmailForm() {
       return;
     }
 
-    setMessage("Success!");
-    router.push("/");
+    setMessage(
+      isEmailVerification
+        ? "Email verified. Continuing..."
+        : "Signed in. Redirecting...",
+    );
+    router.push(isEmailVerification ? "/auth/onboarding" : "/");
     router.refresh();
   };
 
@@ -138,47 +193,60 @@ export function VerifyEmailForm() {
         <p className="text-xs uppercase tracking-[0.2em] text-paper-muted">
           CHECK YOUR EMAIL
         </p>
-        <h1 className="font-serif text-4xl leading-tight">
-          Enter the verification code
-        </h1>
+        <h1 className="font-serif text-4xl leading-tight">{title}</h1>
         <p className="text-sm text-paper-muted">
-          We sent a 6-digit code to{" "}
+          {lead}{" "}
           <span className="font-medium text-paper-ink">
             {email || "your email"}
           </span>{" "}
           <Link
-            href="/auth/sign-in"
+            href={wrongEmailHref}
             className="text-paper-ink underline underline-offset-2 hover:text-black"
           >
             Wrong email?
           </Link>
         </p>
+        {notice === "send-failed" ? (
+          <p className="text-sm text-red-700">
+            We could not send the first code. Use the resend action below to try
+            again.
+          </p>
+        ) : null}
       </div>
 
       {/* Form */}
       <form className="space-y-6" onSubmit={handleSubmit}>
-        {/* 6 Digit Inputs */}
-        <div className="space-y-3">
-          <div className="block text-center text-xs font-medium uppercase tracking-[0.2em] text-paper-muted">
-            VERIFICATION CODE
+        {!isMagicLink ? (
+          <div className="space-y-3">
+            <div className="block text-center text-xs font-medium uppercase tracking-[0.2em] text-paper-muted">
+              VERIFICATION CODE
+            </div>
+            <div className="flex justify-center gap-2 sm:gap-3">
+              {otpSlotIds.map((slotId, index) => (
+                <input
+                  key={slotId}
+                  ref={inputRefs[index]}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete={index === 0 ? "one-time-code" : "off"}
+                  maxLength={6}
+                  value={digits[index]}
+                  className="h-14 w-12 border border-paper-border bg-white text-center text-2xl font-mono outline-none transition focus:border-paper-ink focus:ring-2 focus:ring-paper-ink/20 sm:h-16 sm:w-14"
+                  onChange={(e) => handleDigitChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onFocus={(e) => e.target.select()}
+                />
+              ))}
+            </div>
           </div>
-          <div className="flex justify-center gap-2 sm:gap-3">
-            {digits.map((digit, index) => (
-              <input
-                key={`digit-${digit}`}
-                ref={inputRefs[index]}
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={digit}
-                className="h-14 w-12 border border-paper-border bg-white text-center text-2xl font-mono outline-none transition focus:border-paper-ink focus:ring-2 focus:ring-paper-ink/20 sm:h-16 sm:w-14"
-                onChange={(e) => handleDigitChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onFocus={(e) => e.target.select()}
-              />
-            ))}
+        ) : (
+          <div className={authHelpCardClassName}>
+            <p className="text-sm text-paper-muted">
+              Use the button in the email to continue signing in. Magic links
+              expire quickly and can only be used once.
+            </p>
           </div>
-        </div>
+        )}
 
         {error ? (
           <p className="text-center text-sm text-red-700">{error}</p>
@@ -189,24 +257,35 @@ export function VerifyEmailForm() {
         ) : null}
 
         {/* Submit button */}
-        <Button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-3 text-sm font-medium text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {isSubmitting ? "Verifying..." : "Verify Code"}
-        </Button>
+        {!isMagicLink ? (
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className={authPrimaryButtonClassName}
+          >
+            {isSubmitting
+              ? isEmailVerification
+                ? "Verifying..."
+                : "Signing in..."
+              : isEmailVerification
+                ? "Verify Email"
+                : "Sign In"}
+          </Button>
+        ) : null}
 
-        {/* Resend link */}
         <p className="text-center text-sm text-paper-muted">
-          Didn't receive it?{" "}
+          {isMagicLink ? "Need another link?" : "Didn't receive it?"}{" "}
           <button
             type="button"
             onClick={handleResendCode}
             disabled={isResending}
             className="font-medium text-paper-ink underline underline-offset-2 hover:text-black disabled:opacity-50"
           >
-            {isResending ? "Sending..." : "Resend code"}
+            {isResending
+              ? "Sending..."
+              : isMagicLink
+                ? "Resend magic link"
+                : "Resend code"}
           </button>
         </p>
       </form>

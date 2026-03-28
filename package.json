@@ -1,12 +1,17 @@
 {
   "name": "kraken",
   "version": "0.1.0",
+  "packageManager": "pnpm@10.32.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
+    "test": "node --import tsx --test src/lib/utils/domain.test.ts src/lib/utils/subscription.test.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm lint && pnpm typecheck",
+    "verify": "pnpm check && pnpm test && pnpm build",
     "format": "biome format --write",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

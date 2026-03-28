@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { saveOnboardingUsername } from "@/actions/auth-actions";
+import { AuthField } from "@/components/auth/auth-field";
+import {
+  authHelpCardClassName,
+  authPrimaryButtonClassName,
+  authSecondaryButtonClassName,
+  getAuthInputClassName,
+} from "@/components/auth/auth-styles";
 import { authClient } from "@/lib/auth-client";
 
 type OnboardingFormValues = {
@@ -156,42 +163,24 @@ export function OnboardingForm() {
           })}
         >
           {/* Name field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Display name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              autoComplete="name"
-              placeholder="Krish Gupta"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.name
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("name", {
-                required: "Display name is required.",
-                minLength: {
-                  value: 2,
-                  message: "Name must be at least 2 characters.",
-                },
-              })}
-            />
-            {errors.name?.message ? (
-              <p className="text-xs text-red-700">{errors.name.message}</p>
-            ) : (
-              <p className="text-xs text-paper-muted">
-                This is how your name appears on your publication
-              </p>
-            )}
-          </div>
+          <AuthField
+            id="name"
+            label="Display name"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            error={errors.name?.message}
+            hint="This is how your name appears on your publication"
+            type="text"
+            autoComplete="name"
+            placeholder="Krish Gupta"
+            className="placeholder:text-paper-muted/50"
+            {...register("name", {
+              required: "Display name is required.",
+              minLength: {
+                value: 2,
+                message: "Name must be at least 2 characters.",
+              },
+            })}
+          />
 
           {/* Username field */}
           <div className="space-y-2">
@@ -206,16 +195,14 @@ export function OnboardingForm() {
               type="text"
               autoComplete="username"
               placeholder="krishg"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                usernameStatus === "taken" || errors.username
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : usernameStatus === "available"
+              className={getAuthInputClassName({
+                invalid: usernameStatus === "taken" || Boolean(errors.username),
+                className:
+                  "placeholder:text-paper-muted/50 " +
+                  (usernameStatus === "available"
                     ? "border-green-600 focus:border-green-600 focus:ring-green-200"
-                    : "",
-              ].join(" ")}
+                    : ""),
+              })}
               {...register("username", {
                 required: "Username is required.",
                 pattern: {
@@ -274,7 +261,7 @@ export function OnboardingForm() {
               type="submit"
               disabled={isSubmitting || usernameStatus !== "available"}
               onClick={() => setDestination("editorial")}
-              className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-3 text-sm font-medium text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+              className={authPrimaryButtonClassName}
             >
               {isSubmitting && destination === "editorial"
                 ? "Setting up..."
@@ -285,7 +272,7 @@ export function OnboardingForm() {
               type="submit"
               disabled={isSubmitting || usernameStatus !== "available"}
               onClick={() => setDestination("home")}
-              className="w-full cursor-pointer border border-paper-border bg-white px-4 py-3 text-sm font-medium text-paper-ink transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className={authSecondaryButtonClassName}
             >
               {isSubmitting && destination === "home"
                 ? "Setting up..."
@@ -295,7 +282,7 @@ export function OnboardingForm() {
         </form>
 
         {/* Info box */}
-        <div className="rounded border border-paper-border bg-white p-4">
+        <div className={authHelpCardClassName}>
           <p className="text-xs text-paper-muted">
             <strong className="font-medium text-paper-ink">
               What's the difference?

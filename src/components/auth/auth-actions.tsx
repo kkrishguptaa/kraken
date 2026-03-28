@@ -1,6 +1,7 @@
 import { Button } from "@base-ui/react/button";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { authPrimaryButtonClassName } from "@/components/auth/auth-styles";
 
 type AuthActionsProps = {
   submitLabel: string;
@@ -22,7 +23,7 @@ export function AuthActions({
       <Button
         type="submit"
         disabled={isPending}
-        className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-2 text-sm text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+        className={authPrimaryButtonClassName}
       >
         {isPending ? "Working..." : submitLabel}
       </Button>

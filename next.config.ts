@@ -8,24 +8,8 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
-      }
+      },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/@:username/:path*",
-        destination: "/~/:username/:path*",
-      },
-      {
-        source: "/@:username",
-        destination: "/~/:username",
-      },
-      {
-        source: "/~:username",
-        destination: "/@/:username",
-      },
-    ];
   },
 };
 

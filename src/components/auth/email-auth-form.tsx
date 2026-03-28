@@ -1,13 +1,19 @@
 "use client";
 
 import { Button } from "@base-ui/react/button";
-import { Input } from "@base-ui/react/input";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup } from "@base-ui/react/radio-group";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { sendMagicLink, sendSignInOTP } from "@/actions/auth-actions";
+import { AuthField } from "@/components/auth/auth-field";
+import {
+  authHelpCardClassName,
+  authPrimaryButtonClassName,
+  joinClassNames,
+} from "@/components/auth/auth-styles";
 
 type EmailAuthFormValues = {
   email: string;
@@ -21,6 +27,7 @@ export function EmailAuthForm() {
   const {
     register,
     handleSubmit,
+    setError,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<EmailAuthFormValues>({
@@ -58,12 +65,12 @@ export function EmailAuthForm() {
           >
             {/* OTP Radio */}
             <div
-              className={[
+              className={joinClassNames(
                 "flex cursor-pointer items-start gap-3 rounded border-2 p-4 transition",
                 authMethod === "otp"
                   ? "border-paper-ink bg-paper-ink/5"
                   : "border-paper-border bg-white hover:border-paper-border/60",
-              ].join(" ")}
+              )}
             >
               <Radio.Root
                 value="otp"
@@ -84,12 +91,12 @@ export function EmailAuthForm() {
 
             {/* Magic Link Radio */}
             <div
-              className={[
+              className={joinClassNames(
                 "flex cursor-pointer items-start gap-3 rounded border-2 p-4 transition",
                 authMethod === "magic-link"
                   ? "border-paper-ink bg-paper-ink/5"
                   : "border-paper-border bg-white hover:border-paper-border/60",
-              ].join(" ")}
+              )}
             >
               <Radio.Root
                 value="magic-link"
@@ -115,62 +122,57 @@ export function EmailAuthForm() {
           className="space-y-4"
           onSubmit={handleSubmit(async (values) => {
             clearErrors("root");
+            const email = values.email.trim().toLowerCase();
 
-            // TODO: Implement actual auth method calls
             if (authMethod === "otp") {
-              // Call OTP generation endpoint
-              console.log("Sending OTP to:", values.email);
+              const result = await sendSignInOTP(email);
+              if (!result.ok) {
+                setError("root", { message: result.message });
+                return;
+              }
+
               router.push(
-                `/auth/verify-email?email=${encodeURIComponent(values.email)}&method=otp`,
+                `/auth/verify-email?email=${encodeURIComponent(email)}&flow=sign-in&method=otp`,
               );
             } else {
-              // Call magic link generation endpoint
-              console.log("Sending magic link to:", values.email);
+              const result = await sendMagicLink(email);
+              if (!result.ok) {
+                setError("root", { message: result.message });
+                return;
+              }
+
               router.push(
-                `/auth/verify-email?email=${encodeURIComponent(values.email)}&method=magic-link`,
+                `/auth/verify-email?email=${encodeURIComponent(email)}&flow=sign-in&method=magic-link`,
               );
             }
+
+            router.refresh();
           })}
         >
           {/* Email field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-xs font-medium text-paper-ink"
-            >
-              Email address
-            </label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              placeholder="krish@krishg.com"
-              className={[
-                "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
-                "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
-                "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.email
-                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
-                  : "",
-              ].join(" ")}
-              {...register("email", {
-                required: "Email is required.",
-                validate: (email) => {
-                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  if (!emailRegex.test(email)) {
-                    return "Enter a valid email address.";
-                  }
-                  if (email.length > 254) {
-                    return "Email address is too long.";
-                  }
-                  return true;
-                },
-              })}
-            />
-            {errors.email?.message ? (
-              <p className="text-xs text-red-700">{errors.email.message}</p>
-            ) : null}
-          </div>
+          <AuthField
+            id="email"
+            label="Email address"
+            error={errors.email?.message}
+            type="email"
+            autoComplete="email"
+            placeholder="krish@krishg.com"
+            labelClassName="block text-xs font-medium text-paper-ink"
+            className="placeholder:text-paper-muted/50"
+            {...register("email", {
+              required: "Email is required.",
+              validate: (email) => {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                  return "Enter a valid email address.";
+                }
+                if (email.length > 254) {
+                  return "Email address is too long.";
+                }
+                return true;
+              },
+            })}
+          />
 
           {errors.root?.message ? (
             <p className="text-sm text-red-700">{errors.root.message}</p>
@@ -180,7 +182,7 @@ export function EmailAuthForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full cursor-pointer border border-paper-ink bg-paper-ink px-4 py-3 text-sm font-medium text-paper-base transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+            className={authPrimaryButtonClassName}
           >
             {isSubmitting
               ? "Sending..."
@@ -202,7 +204,7 @@ export function EmailAuthForm() {
         </form>
 
         {/* Help text */}
-        <div className="rounded border border-paper-border bg-white p-4">
+        <div className={authHelpCardClassName}>
           <p className="text-xs text-paper-muted">
             {authMethod === "otp" ? (
               <>

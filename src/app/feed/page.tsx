@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { ArticleCard, EditorialGrid, Masthead } from "@/components/editorial";
 import { useOnboarded } from "@/hooks/onboarded";
-import { getRecentUpdates } from "@/lib/queries/updates";
+import { getFeedUpdatesForUser } from "@/lib/queries/updates";
 import { assignCardSizes, getCardGridClasses } from "@/lib/utils/card-layout";
 
 export const dynamic = "force-dynamic";
 
 export default async function FeedPage() {
   const session = await useOnboarded();
-  const articles = await getRecentUpdates(12);
+  const articles = await getFeedUpdatesForUser(session.user.id, 12);
   const cardSizes = assignCardSizes(articles.length);
 
   return (
@@ -45,7 +45,8 @@ export default async function FeedPage() {
         ) : (
           <div className="text-center py-16 px-6">
             <p className="text-body-editorial text-paper-muted">
-              No public krakens yet. Be the first to publish.
+              Your feed is empty. Subscribe to writers and they will appear here
+              automatically.
             </p>
           </div>
         )}

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+
 function isPrimaryHost(hostname: string): boolean {
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return true;
@@ -51,7 +52,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const rewriteUrl = new URL(`/@${payload.username}${pathname}${search}`, request.url);
+  const rewriteUrl = new URL(
+    `/@${payload.username}${pathname}${search}`,
+    request.url,
+  );
 
   return NextResponse.rewrite(rewriteUrl);
 }
