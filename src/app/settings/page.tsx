@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { publications } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
+import { verifyProjectDomain } from "@/lib/vercel-domains";
 
 export const dynamic = "force-dynamic";
 
@@ -23,13 +24,45 @@ const statusCopy: Record<string, string> = {
     "Publication title must be at least 2 characters.",
   "domain-added": "Custom domain added and verified.",
   "domain-pending-verification":
-    "Domain added. Complete DNS verification and click Verify.",
+    "Domain saved. Configure DNS records below, wait for propagation, then click Verify.",
   "domain-verified": "Domain verified successfully.",
   "domain-removed": "Custom domain removed.",
-  "domain-add-failed": "Could not add domain on Vercel.",
   "domain-verify-failed": "Could not verify domain yet.",
   "invalid-domain": "Please enter a valid domain.",
 };
+
+type DomainVerificationRecord = {
+  type?: string;
+  domain?: string;
+  value?: string;
+  reason?: string;
+};
+
+function getFallbackDnsRecords(domain: string): DomainVerificationRecord[] {
+  const parts = domain.split(".").filter(Boolean);
+
+  if (parts.length <= 2) {
+    return [
+      {
+        type: "A",
+        domain: "@",
+        value: "76.76.21.21",
+        reason: "Use this for apex/root domains.",
+      },
+    ];
+  }
+
+  const host = parts.slice(0, -2).join(".");
+
+  return [
+    {
+      type: "CNAME",
+      domain: host,
+      value: "cname.vercel-dns.com",
+      reason: "Use this for subdomains.",
+    },
+  ];
+}
 
 interface PageProps {
   searchParams: Promise<{ status?: string }>;
@@ -49,6 +82,21 @@ export default async function SettingsPage({ searchParams }: PageProps) {
     .from(publications)
     .where(eq(publications.userId, session.user.id))
     .then((rows) => rows[0]);
+
+  let verificationRecords: DomainVerificationRecord[] = [];
+
+  if (publication?.customDomain && !publication.customDomainVerified) {
+    try {
+      const verification = await verifyProjectDomain(publication.customDomain);
+      verificationRecords = verification.verification;
+    } catch {
+      verificationRecords = getFallbackDnsRecords(publication.customDomain);
+    }
+
+    if (verificationRecords.length === 0) {
+      verificationRecords = getFallbackDnsRecords(publication.customDomain);
+    }
+  }
 
   const notice = status ? statusCopy[status] : null;
 
@@ -150,39 +198,83 @@ export default async function SettingsPage({ searchParams }: PageProps) {
             </form>
 
             {publication?.customDomain ? (
-              <div className="flex flex-wrap items-center gap-3 text-sm text-paper-muted">
-                <span>
-                  Current: {publication.customDomain} (
-                  {publication.customDomainVerified ? "verified" : "pending"})
-                </span>
+              <div className="space-y-4 text-sm text-paper-muted">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span>
+                    Current: {publication.customDomain} (
+                    {publication.customDomainVerified ? "verified" : "pending"})
+                  </span>
 
-                <form action={verifyCustomDomain}>
-                  <input
-                    type="hidden"
-                    name="customDomain"
-                    value={publication.customDomain}
-                  />
-                  <Button type="submit" variant="secondary" className="text-sm">
-                    Verify domain
-                  </Button>
-                </form>
+                  <form action={verifyCustomDomain}>
+                    <input
+                      type="hidden"
+                      name="customDomain"
+                      value={publication.customDomain}
+                    />
+                    <Button type="submit" variant="secondary" className="text-sm">
+                      Verify domain
+                    </Button>
+                  </form>
 
-                <form action={removeCustomDomain}>
-                  <input
-                    type="hidden"
-                    name="customDomain"
-                    value={publication.customDomain}
-                  />
-                  <Button type="submit" variant="danger" className="text-sm">
-                    Remove domain
-                  </Button>
-                </form>
+                  <form action={removeCustomDomain}>
+                    <input
+                      type="hidden"
+                      name="customDomain"
+                      value={publication.customDomain}
+                    />
+                    <Button type="submit" variant="danger" className="text-sm">
+                      Remove domain
+                    </Button>
+                  </form>
+                </div>
+
+                {!publication.customDomainVerified ? (
+                  <div className="space-y-2 border border-paper-border bg-paper-base/70 p-4">
+                    <p className="text-paper-ink">
+                      Required DNS records for {publication.customDomain}:
+                    </p>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full border border-paper-border text-left text-meta-small text-paper-ink">
+                        <thead className="bg-white/60">
+                          <tr>
+                            <th className="border-b border-paper-border px-3 py-2">Type</th>
+                            <th className="border-b border-paper-border px-3 py-2">Host</th>
+                            <th className="border-b border-paper-border px-3 py-2">Value</th>
+                            <th className="border-b border-paper-border px-3 py-2">Notes</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {verificationRecords.map((record, index) => (
+                            <tr key={`${record.type || "record"}-${record.domain || index}`}>
+                              <td className="border-b border-paper-border px-3 py-2">
+                                {record.type || "-"}
+                              </td>
+                              <td className="border-b border-paper-border px-3 py-2">
+                                {record.domain || "@"}
+                              </td>
+                              <td className="border-b border-paper-border px-3 py-2 break-all">
+                                {record.value || "-"}
+                              </td>
+                              <td className="border-b border-paper-border px-3 py-2">
+                                {record.reason || "-"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p>
+                      After saving DNS records at your DNS provider, allow propagation
+                      and click <span className="text-paper-ink">Verify domain</span>.
+                    </p>
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
             <p className="text-sm text-paper-muted">
-              Configure DNS records from Vercel's response, then use Verify
-              domain.
+              You can add the domain first, then finish verification once DNS is
+              live.
             </p>
           </div>
 

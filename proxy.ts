@@ -1,5 +1,17 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+function getHandleUsername(pathname: string): string | null {
+  if (!pathname.startsWith("/@") && !pathname.startsWith("/~")) {
+    return null;
+  }
+
+  const withoutLeadingSlash = pathname.slice(1);
+  const firstSegment = withoutLeadingSlash.split("/")[0];
+  const username = firstSegment.slice(1).trim().toLowerCase();
+
+  return username.length > 0 ? username : null;
+}
+
 function isPrimaryHost(hostname: string): boolean {
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return true;
@@ -25,12 +37,12 @@ function isPrimaryHost(hostname: string): boolean {
 export async function proxy(request: NextRequest) {
   const hostHeader = request.headers.get("host") || "";
   const hostname = hostHeader.split(":")[0];
+  const pathname = request.nextUrl.pathname;
 
   if (isPrimaryHost(hostname)) {
     return NextResponse.next();
   }
 
-  const pathname = request.nextUrl.pathname;
   const search = request.nextUrl.search;
   const lookupUrl = new URL(
     `/api/internal/domain-lookup?domain=${encodeURIComponent(hostname)}`,
@@ -49,6 +61,17 @@ export async function proxy(request: NextRequest) {
 
   const payload = (await lookup.json()) as { username?: string };
   if (!payload.username) {
+    return NextResponse.next();
+  }
+
+  const ownerUsername = payload.username.toLowerCase();
+  const handleUsername = getHandleUsername(pathname);
+
+  if (handleUsername) {
+    if (handleUsername !== ownerUsername) {
+      return new NextResponse("Not Found", { status: 404 });
+    }
+
     return NextResponse.next();
   }
 

@@ -116,7 +116,17 @@ export async function addCustomDomain(formData: FormData) {
       result.verified ? "domain-added" : "domain-pending-verification",
     );
   } catch {
-    toSettingsRedirect("domain-add-failed");
+    await db
+      .update(publications)
+      .set({
+        customDomain: domain,
+        customDomainVerified: false,
+        updatedAt: new Date(),
+      })
+      .where(eq(publications.id, publication.id));
+
+    revalidatePath("/settings");
+    toSettingsRedirect("domain-pending-verification");
   }
 }
 

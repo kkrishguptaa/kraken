@@ -45,46 +45,46 @@ export function AvatarMenu({
             className="z-50"
           >
             <Menu.Popup className="min-w-[180px] bg-paper-base border border-paper-border shadow-lg">
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link
                   href={userUsername ? `/@${userUsername}` : "/feed"}
                   className="block w-full"
                 >
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                   Profile
-                </Link>
               </Menu.Item>
+                </Link>
 
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/feed" className="block w-full">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                   Feed
-                </Link>
               </Menu.Item>
+                </Link>
 
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/subscriptions" className="block w-full">
-                  Subscriptions
-                </Link>
-              </Menu.Item>
-
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors">
-                <Link href="/editorial" className="block w-full">
-                  Editorial
-                </Link>
-              </Menu.Item>
-
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
-                <Link href="/settings" className="block w-full">
-                  Settings
-                </Link>
+                  Subscriptions
               </Menu.Item>
+                </Link>
+
+                <Link href="/editorial" className="block w-full">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors">
+                  Editorial
+              </Menu.Item>
+                </Link>
+
+                <Link href="/settings" className="block w-full">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
+                  Settings
+              </Menu.Item>
+                </Link>
 
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <button
                   onClick={() => {
                     authClient.signOut();
-                    router.refresh();
+                    router.push("/auth/sign-in");
                   }}
-                  type="submit"
+                  type="button"
                   className="block w-full text-left"
                 >
                   Logout
