@@ -10,9 +10,26 @@ type VercelDomainResponse = {
   verified?: boolean;
   verification?: VercelDomainVerification[];
   error?: {
+    code?: string;
     message?: string;
   };
 };
+
+function toVercelError(
+  action: "add" | "verify" | "remove",
+  status: number,
+  payload: VercelDomainResponse | null,
+  fallbackMessage: string,
+): Error {
+  const code = payload?.error?.code;
+  const message = payload?.error?.message || fallbackMessage;
+
+  if (code) {
+    return new Error(`Vercel ${action} failed (${status}, ${code}): ${message}`);
+  }
+
+  return new Error(`Vercel ${action} failed (${status}): ${message}`);
+}
 
 function getEnv(name: string): string {
   const value = process.env[name];
@@ -56,9 +73,12 @@ export async function addProjectDomain(domain: string) {
   const payload = await parseJson<VercelDomainResponse>(response);
 
   if (!response.ok) {
-    const errorMessage =
-      payload?.error?.message || "Failed to add domain on Vercel";
-    throw new Error(errorMessage);
+    throw toVercelError(
+      "add",
+      response.status,
+      payload,
+      "Failed to add domain on Vercel",
+    );
   }
 
   return {
@@ -84,9 +104,12 @@ export async function verifyProjectDomain(domain: string) {
   const payload = await parseJson<VercelDomainResponse>(response);
 
   if (!response.ok) {
-    const errorMessage =
-      payload?.error?.message || "Failed to verify domain on Vercel";
-    throw new Error(errorMessage);
+    throw toVercelError(
+      "verify",
+      response.status,
+      payload,
+      "Failed to verify domain on Vercel",
+    );
   }
 
   return {
@@ -110,8 +133,11 @@ export async function removeProjectDomain(domain: string) {
 
   if (!response.ok) {
     const payload = await parseJson<VercelDomainResponse>(response);
-    const errorMessage =
-      payload?.error?.message || "Failed to remove domain from Vercel";
-    throw new Error(errorMessage);
+    throw toVercelError(
+      "remove",
+      response.status,
+      payload,
+      "Failed to remove domain from Vercel",
+    );
   }
 }

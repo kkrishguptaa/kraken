@@ -1,7 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { PublicationIssueView } from "@/components/editorial/PublicationIssueView";
-import { publications, user } from "@/db/schema";
+import { follows, publications, user } from "@/db/schema";
 import { getSession } from "@/hooks/session";
 import { db } from "@/lib/db";
 import { isViewerSubscribedToPublication } from "@/lib/queries/subscriptions";
@@ -48,7 +48,7 @@ export default async function PublicationIssuePage({
   }
 
   const publication = await db
-    .select({ publicationName: publications.name })
+    .select({ publicationName: publications.name, ownerId: user.id })
     .from(user)
     .leftJoin(publications, eq(publications.userId, user.id))
     .where(eq(user.username, username))
@@ -62,6 +62,21 @@ export default async function PublicationIssuePage({
     !!session?.user?.email && !isOwnPublication
       ? await isViewerSubscribedToPublication(username, session.user.email)
       : false;
+  const isFollowing =
+    !!session?.user?.id && !!publication?.ownerId && !isOwnPublication
+      ? Boolean(
+          await db
+            .select({ followerId: follows.followerId })
+            .from(follows)
+            .where(
+              and(
+                eq(follows.followerId, session.user.id),
+                eq(follows.followingId, publication.ownerId),
+              ),
+            )
+            .then((rows) => rows[0]),
+        )
+      : false;
 
   return (
     <PublicationIssueView
@@ -71,6 +86,7 @@ export default async function PublicationIssuePage({
       session={session}
       isOwnPublication={isOwnPublication}
       isSubscribed={isSubscribed}
+      isFollowing={isFollowing}
       subscribe={subscribe}
     />
   );

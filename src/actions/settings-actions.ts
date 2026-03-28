@@ -13,8 +13,23 @@ import {
   verifyProjectDomain,
 } from "@/lib/vercel-domains";
 
-function toSettingsRedirect(status: string): never {
-  redirect(`/settings?status=${status}`);
+function getErrorDetail(error: unknown): string | null {
+  if (error instanceof Error) {
+    const detail = error.message.trim();
+    return detail.length > 0 ? detail.slice(0, 240) : null;
+  }
+
+  return null;
+}
+
+function toSettingsRedirect(status: string, detail?: string | null): never {
+  const params = new URLSearchParams({ status });
+
+  if (detail) {
+    params.set("detail", detail);
+  }
+
+  redirect(`/settings?${params.toString()}`);
 }
 
 async function ensurePublication(userId: string, fallbackName: string) {
@@ -56,7 +71,7 @@ export async function updateDisplayName(formData: FormData) {
     .where(eq(user.id, session.user.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/@${session.user.username}`);
+  revalidatePath(`/~${session.user.username}`);
   toSettingsRedirect("name-updated");
 }
 
@@ -115,7 +130,9 @@ export async function addCustomDomain(formData: FormData) {
     toSettingsRedirect(
       result.verified ? "domain-added" : "domain-pending-verification",
     );
-  } catch {
+  } catch (error) {
+    const detail = getErrorDetail(error);
+
     await db
       .update(publications)
       .set({
@@ -126,7 +143,7 @@ export async function addCustomDomain(formData: FormData) {
       .where(eq(publications.id, publication.id));
 
     revalidatePath("/settings");
-    toSettingsRedirect("domain-pending-verification");
+    toSettingsRedirect("domain-pending-verification", detail);
   }
 }
 
@@ -161,8 +178,9 @@ export async function verifyCustomDomain(formData: FormData) {
     toSettingsRedirect(
       result.verified ? "domain-verified" : "domain-pending-verification",
     );
-  } catch {
-    toSettingsRedirect("domain-verify-failed");
+  } catch (error) {
+    const detail = getErrorDetail(error);
+    toSettingsRedirect("domain-verify-failed", detail);
   }
 }
 

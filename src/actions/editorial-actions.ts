@@ -93,7 +93,6 @@ function revalidateEditorialPaths(
   revalidatePath("/");
   revalidatePath("/feed");
   revalidatePath("/editorial");
-  revalidatePath(`/@${username}`);
   revalidatePath(`/~${username}`);
   if (editionNumber) {
     revalidatePath(`/~${username}/${editionNumber}`);

@@ -45,38 +45,38 @@ export function AvatarMenu({
             className="z-50"
           >
             <Menu.Popup className="min-w-[180px] bg-paper-base border border-paper-border shadow-lg">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link
-                  href={userUsername ? `/@${userUsername}` : "/feed"}
+                  href={userUsername ? `/~${userUsername}` : "/feed"}
                   className="block w-full"
                 >
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
-                  Profile
-              </Menu.Item>
+                  Publication
                 </Link>
+              </Menu.Item>
 
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/feed" className="block w-full">
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                   Feed
-              </Menu.Item>
                 </Link>
+              </Menu.Item>
 
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/subscriptions" className="block w-full">
-              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                   Subscriptions
-              </Menu.Item>
                 </Link>
+              </Menu.Item>
 
-                <Link href="/editorial" className="block w-full">
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors">
+                <Link href="/editorial" className="block w-full">
                   Editorial
-              </Menu.Item>
                 </Link>
+              </Menu.Item>
 
-                <Link href="/settings" className="block w-full">
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
+                <Link href="/settings" className="block w-full">
                   Settings
-              </Menu.Item>
                 </Link>
+              </Menu.Item>
 
               <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <button

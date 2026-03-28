@@ -76,7 +76,7 @@ export async function proxy(request: NextRequest) {
   }
 
   const rewriteUrl = new URL(
-    `/@${payload.username}${pathname}${search}`,
+    `/~${payload.username}${pathname}${search}`,
     request.url,
   );
 

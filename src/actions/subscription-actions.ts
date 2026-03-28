@@ -249,6 +249,76 @@ export async function subscribeToPublication(formData: FormData) {
   );
 }
 
+export async function followPublication(formData: FormData) {
+  const session = await useAuthenticated();
+  const returnTo = normalizeReturnTo(formData.get("returnTo"));
+
+  const rawUsername = formData.get("publicationUsername");
+  const publicationUsername =
+    typeof rawUsername === "string"
+      ? rawUsername.trim().toLowerCase().replace(/^[@~]/, "")
+      : "";
+
+  if (!publicationUsername) {
+    redirectWithStatus(returnTo, "missing-publication");
+  }
+
+  const publicationOwner = await db
+    .select({ id: user.id, username: user.username })
+    .from(user)
+    .where(eq(user.username, publicationUsername))
+    .then((rows) => rows[0]);
+
+  if (!publicationOwner) {
+    redirectWithStatus(returnTo, "publication-not-found");
+  }
+
+  await ensureFollowRelationship({
+    followerId: session.user.id,
+    followingId: publicationOwner.id,
+  });
+
+  revalidatePath("/feed");
+  revalidatePath("/subscriptions");
+  revalidatePath(`/~${publicationUsername}`);
+  redirectWithStatus(returnTo, "followed");
+}
+
+export async function unfollowPublication(formData: FormData) {
+  const session = await useAuthenticated();
+  const returnTo = normalizeReturnTo(formData.get("returnTo"));
+
+  const rawUsername = formData.get("publicationUsername");
+  const publicationUsername =
+    typeof rawUsername === "string"
+      ? rawUsername.trim().toLowerCase().replace(/^[@~]/, "")
+      : "";
+
+  if (!publicationUsername) {
+    redirectWithStatus(returnTo, "missing-publication");
+  }
+
+  const publicationOwner = await db
+    .select({ id: user.id, username: user.username })
+    .from(user)
+    .where(eq(user.username, publicationUsername))
+    .then((rows) => rows[0]);
+
+  if (!publicationOwner) {
+    redirectWithStatus(returnTo, "publication-not-found");
+  }
+
+  await removeFollowRelationship({
+    followerId: session.user.id,
+    followingId: publicationOwner.id,
+  });
+
+  revalidatePath("/feed");
+  revalidatePath("/subscriptions");
+  revalidatePath(`/~${publicationUsername}`);
+  redirectWithStatus(returnTo, "unfollowed");
+}
+
 export async function updateSubscriptionNotifications(formData: FormData) {
   const session = await useAuthenticated();
 

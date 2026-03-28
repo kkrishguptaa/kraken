@@ -29,6 +29,7 @@ interface PublicationIssueViewProps {
   session: SessionLike | null;
   isOwnPublication: boolean;
   isSubscribed: boolean;
+  isFollowing: boolean;
   subscribe?: string;
 }
 
@@ -39,6 +40,7 @@ export function PublicationIssueView({
   session,
   isOwnPublication,
   isSubscribed,
+  isFollowing,
   subscribe,
 }: PublicationIssueViewProps) {
   const publishedDate =
@@ -76,7 +78,7 @@ export function PublicationIssueView({
                 <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-paper-muted">
                   {issue.userUsername && (
                     <Link
-                      href={`/@${issue.userUsername}`}
+                      href={`/~${issue.userUsername}`}
                       className="text-paper-ink underline-offset-4 hover:underline"
                     >
                       by {issue.userName || issue.userUsername}
@@ -115,6 +117,7 @@ export function PublicationIssueView({
                 isAuthenticated={!!session}
                 isOwnPublication={isOwnPublication}
                 isSubscribed={isSubscribed}
+                isFollowing={isFollowing}
                 returnTo={`/~${username}`}
                 status={subscribe}
               />

@@ -244,7 +244,7 @@ export function OnboardingForm() {
                 <p className="text-xs text-paper-muted">
                   Your URL:{" "}
                   <span className="font-mono text-paper-ink">
-                    kraken.krishg.com/@{username.trim().toLowerCase()}
+                    kraken.krishg.com/~{username.trim().toLowerCase()}
                   </span>
                 </p>
               )}

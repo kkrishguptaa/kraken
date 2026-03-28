@@ -7,7 +7,7 @@ import {
 } from "@/lib/utils/subscription";
 
 test("normalizeReturnTo keeps safe internal paths", () => {
-  assert.equal(normalizeReturnTo("/@krish"), "/@krish");
+  assert.equal(normalizeReturnTo("/~krish"), "/~krish");
   assert.equal(
     normalizeReturnTo("/subscriptions?status=subscribed"),
     "/subscriptions?status=subscribed",

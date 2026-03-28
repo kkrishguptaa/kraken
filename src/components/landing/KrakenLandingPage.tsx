@@ -14,7 +14,7 @@ interface KrakenLandingPageProps {
 export function KrakenLandingPage({ session = null }: KrakenLandingPageProps) {
   const isSignedIn = Boolean(session);
   const publicationHref = session?.user?.username
-    ? `/@${session.user.username}`
+    ? `/~${session.user.username}`
     : "/auth/sign-up";
 
   return (
@@ -112,7 +112,7 @@ export function KrakenLandingPage({ session = null }: KrakenLandingPageProps) {
                 IDENTITY
               </p>
               <h3 className="font-family-display text-2xl leading-tight tracking-normal text-paper-ink">
-                Start with @username, grow into your own space.
+                Start with ~username, grow into your own space.
               </h3>
               <p className="text-body-lg leading-snug text-paper-ink">
                 Begin with a simple profile, then add a custom domain if your

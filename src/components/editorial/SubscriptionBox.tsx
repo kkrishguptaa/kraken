@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { subscribeToPublication } from "@/actions/subscription-actions";
+import {
+  followPublication,
+  subscribeToPublication,
+  unfollowPublication,
+} from "@/actions/subscription-actions";
 import { Button } from "@/components/ui/button";
 
 type SubscriptionBoxProps = {
@@ -8,6 +12,7 @@ type SubscriptionBoxProps = {
   isAuthenticated: boolean;
   isOwnPublication: boolean;
   isSubscribed: boolean;
+  isFollowing: boolean;
   returnTo: string;
   status?: string;
 };
@@ -18,6 +23,7 @@ export function SubscriptionBox({
   isAuthenticated,
   isOwnPublication,
   isSubscribed,
+  isFollowing,
   returnTo,
   status,
 }: SubscriptionBoxProps) {
@@ -30,6 +36,8 @@ export function SubscriptionBox({
     "missing-email": "Enter a valid email to subscribe.",
     "publication-not-found": "Publication not found.",
     "missing-publication": "Missing publication username.",
+    followed: `You're now following ~${publicationUsername}.`,
+    unfollowed: `You unfollowed ~${publicationUsername}.`,
   };
 
   const notice = status ? noticeMap[status] : null;
@@ -51,6 +59,22 @@ export function SubscriptionBox({
           <p className="text-sm text-paper-muted">
             This is your publication profile.
           </p>
+        ) : null}
+
+        {!isOwnPublication && isAuthenticated ? (
+          <form action={isFollowing ? unfollowPublication : followPublication}>
+            <input
+              type="hidden"
+              name="publicationUsername"
+              value={publicationUsername}
+            />
+            <input type="hidden" name="returnTo" value={returnTo} />
+            <Button variant={isFollowing ? "secondary" : "primary"} className="text-sm">
+              {isFollowing
+                ? `Following ~${publicationUsername}`
+                : `Follow ~${publicationUsername}`}
+            </Button>
+          </form>
         ) : null}
 
         {!isOwnPublication && !isAuthenticated ? (

@@ -65,12 +65,12 @@ function getFallbackDnsRecords(domain: string): DomainVerificationRecord[] {
 }
 
 interface PageProps {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; detail?: string }>;
 }
 
 export default async function SettingsPage({ searchParams }: PageProps) {
   const session = await useOnboarded();
-  const { status } = await searchParams;
+  const { status, detail } = await searchParams;
 
   const publication = await db
     .select({
@@ -84,12 +84,16 @@ export default async function SettingsPage({ searchParams }: PageProps) {
     .then((rows) => rows[0]);
 
   let verificationRecords: DomainVerificationRecord[] = [];
+  let verificationLookupError: string | null = null;
 
   if (publication?.customDomain && !publication.customDomainVerified) {
     try {
       const verification = await verifyProjectDomain(publication.customDomain);
       verificationRecords = verification.verification;
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) {
+        verificationLookupError = error.message;
+      }
       verificationRecords = getFallbackDnsRecords(publication.customDomain);
     }
 
@@ -124,7 +128,12 @@ export default async function SettingsPage({ searchParams }: PageProps) {
 
           {notice ? (
             <div className="border border-paper-border bg-white/70 px-4 py-3 text-meta-small text-paper-ink">
-              {notice}
+              <p>{notice}</p>
+              {detail ? (
+                <p className="mt-2 border-t border-paper-border pt-2 text-paper-muted">
+                  <span className="text-paper-ink">Details:</span> {detail}
+                </p>
+              ) : null}
             </div>
           ) : null}
 
@@ -267,6 +276,12 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                       After saving DNS records at your DNS provider, allow propagation
                       and click <span className="text-paper-ink">Verify domain</span>.
                     </p>
+                    {verificationLookupError ? (
+                      <p className="border-t border-paper-border pt-2 text-paper-muted">
+                        <span className="text-paper-ink">Latest Vercel response:</span>{" "}
+                        {verificationLookupError}
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
