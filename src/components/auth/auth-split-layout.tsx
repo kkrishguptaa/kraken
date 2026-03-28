@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
-import { user } from "@/db/schema";
+import { count } from "drizzle-orm";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { count } from "drizzle-orm";
+import { user } from "@/db/schema";
+import { db } from "@/lib/db";
 
 type AuthSplitLayoutProps = {
   children: ReactNode;
@@ -14,7 +14,9 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
   const numberEndings = ["th", "st", "nd", "rd"];
   const getOrdinal = (n: number) => {
     const v = n % 100;
-    return n + (numberEndings[(v - 20) % 10] || numberEndings[v] || numberEndings[0]);
+    return (
+      n + (numberEndings[(v - 20) % 10] || numberEndings[v] || numberEndings[0])
+    );
   };
   const ordinalNumber = getOrdinal(numberOfPeople[0].count + 1);
   return (
@@ -23,7 +25,10 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
       <div className="flex w-full flex-col lg:w-1/2">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-paper-border bg-paper-base px-6 py-4 lg:px-12">
-          <Link href="/" className="font-serif text-lg font-medium tracking-tight">
+          <Link
+            href="/"
+            className="font-serif text-lg font-medium tracking-tight"
+          >
             KRAKEN
           </Link>
           <Link
@@ -49,10 +54,14 @@ export function AuthSplitLayout({ children }: AuthSplitLayoutProps) {
           </h2>
           <div className="h-px bg-white/20" />
           <p className="font-serif text-xl italic leading-relaxed text-white/90">
-            Newsletter for friends not subscribers. A place for anyone who wishes to write about their day to their friends, and keep connect with them for as long as possible. No algorithms, no ads, just you and your friends.
+            Newsletter for friends not subscribers. A place for anyone who
+            wishes to write about their day to their friends, and keep connect
+            with them for as long as possible. No algorithms, no ads, just you
+            and your friends.
           </p>
           <p className="text-sm text-white/70">
-            Become the {ordinalNumber} person to join the KRAKEN community. We can't wait to see what you'll share.
+            Become the {ordinalNumber} person to join the KRAKEN community. We
+            can't wait to see what you'll share.
           </p>
         </div>
       </div>

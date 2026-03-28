@@ -5,6 +5,13 @@ import { db } from "@/lib/db";
 import { calculateReadTime } from "../utils/text";
 
 /**
+ * Validate username format
+ */
+function isValidUsername(username: string): boolean {
+  return /^[a-zA-Z0-9_-]{1,50}$/.test(username);
+}
+
+/**
  * Fetch recent published updates for homepage
  */
 export async function getRecentUpdates(limit = 10): Promise<Article[]> {
@@ -32,7 +39,7 @@ export async function getRecentUpdates(limit = 10): Promise<Article[]> {
     editionNumber: row.editionNumber || 1,
     headline: row.title,
     content: row.content,
-    publishedAt: row.publishedAt || new Date(),
+    publishedAt: row.publishedAt ?? new Date(),
     readTime: calculateReadTime(row.content),
     userId: row.userId,
     userUsername: row.userUsername || "unknown",
@@ -42,7 +49,14 @@ export async function getRecentUpdates(limit = 10): Promise<Article[]> {
 /**
  * Fetch published updates by username
  */
-export async function getIssuesByUsername(username: string, limit = 10): Promise<Article[]> {
+export async function getIssuesByUsername(
+  username: string,
+  limit = 10,
+): Promise<Article[]> {
+  if (!isValidUsername(username)) {
+    return [];
+  }
+
   const results = await db
     .select({
       id: issues.id,
@@ -56,7 +70,7 @@ export async function getIssuesByUsername(username: string, limit = 10): Promise
     })
     .from(issues)
     .leftJoin(publications, eq(issues.publicationId, publications.id))
-    .leftJoin(user, eq(issues.userId, user.id))
+    .innerJoin(user, eq(issues.userId, user.id))
     .where(
       and(
         eq(user.username, username),
@@ -73,7 +87,7 @@ export async function getIssuesByUsername(username: string, limit = 10): Promise
     editionNumber: row.editionNumber || 1,
     headline: row.title,
     content: row.content,
-    publishedAt: row.publishedAt || new Date(),
+    publishedAt: row.publishedAt ?? new Date(),
     readTime: calculateReadTime(row.content),
     userId: row.userId,
     userUsername: row.userUsername || "unknown",
@@ -81,9 +95,16 @@ export async function getIssuesByUsername(username: string, limit = 10): Promise
 }
 
 /**
- * Fetch a single issue by ID (for detail view)
+ * Fetch a single published issue by username + edition number (for detail view)
  */
-export async function getIssueById(issueId: string) {
+export async function getIssueByEditionNumber(
+  username: string,
+  editionNumber: number,
+) {
+  if (!isValidUsername(username) || !Number.isInteger(editionNumber) || editionNumber < 1) {
+    return null;
+  }
+
   const result = await db
     .select({
       id: issues.id,
@@ -102,7 +123,8 @@ export async function getIssueById(issueId: string) {
     .leftJoin(user, eq(issues.userId, user.id))
     .where(
       and(
-        eq(issues.id, issueId),
+        eq(user.username, username),
+        eq(issues.editionNumber, editionNumber),
         eq(issues.status, "published"),
         isNull(issues.deletedAt),
       ),
@@ -119,7 +141,7 @@ export async function getIssueById(issueId: string) {
     editionNumber: result.editionNumber || 1,
     headline: result.title,
     content: result.content,
-    publishedAt: result.publishedAt || new Date(),
+    publishedAt: result.publishedAt ?? new Date(),
     readTime: calculateReadTime(result.content),
     userId: result.userId,
     userName: result.userName,

@@ -2,10 +2,10 @@
 
 import { Menu } from "@base-ui/react/menu";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { UserAvatar } from "./UserAvatar";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from 'next/navigation'
+import { UserAvatar } from "./UserAvatar";
 
 interface AvatarMenuProps {
   userName: string;
@@ -14,23 +14,24 @@ interface AvatarMenuProps {
   size?: "small" | "medium" | "large";
 }
 
-/**
- * Avatar with hoverable dropdown menu
- * Shows Editorial, Profile, Subscriptions, Settings, Logout on hover
- * Displays user's image if available, otherwise shows initials
- */
-export function AvatarMenu({ userName, userImage, userUsername, size = "large" }: AvatarMenuProps) {
+export function AvatarMenu({
+  userName,
+  userImage,
+  userUsername,
+  size = "large",
+}: AvatarMenuProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: I did not find any interactive tag suitable for the avatar trigger, and the menu library requires a single child for the trigger, so I wrapped it in a div with mouse events to control the menu open state.
+    // biome-ignore lint/a11y/useSemanticElements: Next.Js doesn't allow buttons inside buttons or something
 <div
       className="relative"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
+      role="button"
+      tabIndex={0}
     >
-      {/* Avatar trigger */}
       <Menu.Root open={open} onOpenChange={setOpen}>
         <Menu.Trigger className="cursor-pointer">
           <UserAvatar name={userName} image={userImage} size={size} />
@@ -43,44 +44,51 @@ export function AvatarMenu({ userName, userImage, userUsername, size = "large" }
             sideOffset={8}
             className="z-50"
           >
-            <Menu.Popup className="min-w-[180px] bg-[var(--color-paper-base)] border border-[var(--color-paper-border)] shadow-lg">
-
-              {/* Profile */}
-              <Menu.Item className="px-4 py-3 text-body-editorial text-[var(--color-paper-ink)] hover:bg-[var(--color-paper-border)] cursor-pointer transition-colors border-t border-[var(--color-paper-border)]">
-                <Link href={userUsername ? `/@${userUsername}` : "/profile"} className="block w-full">
+            <Menu.Popup className="min-w-[180px] bg-paper-base border border-paper-border shadow-lg">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
+                <Link
+                  href={userUsername ? `/~${userUsername}` : "/profile"}
+                  className="block w-full"
+                >
                   Profile
                 </Link>
               </Menu.Item>
 
-              {/* Subscriptions */}
-              <Menu.Item className="px-4 py-3 text-body-editorial text-[var(--color-paper-ink)] hover:bg-[var(--color-paper-border)] cursor-pointer transition-colors border-t border-[var(--color-paper-border)]">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
+                <Link href="/feed" className="block w-full">
+                  Feed
+                </Link>
+              </Menu.Item>
+
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/subscriptions" className="block w-full">
                   Subscriptions
                 </Link>
               </Menu.Item>
 
-              {/* Editorial */}
-              <Menu.Item className="px-4 py-3 text-body-editorial text-[var(--color-paper-ink)] hover:bg-[var(--color-paper-border)] cursor-pointer transition-colors">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors">
                 <Link href="/editorial" className="block w-full">
                   Editorial
                 </Link>
               </Menu.Item>
 
-              {/* Settings */}
-              <Menu.Item className="px-4 py-3 text-body-editorial text-[var(--color-paper-ink)] hover:bg-[var(--color-paper-border)] cursor-pointer transition-colors border-t border-[var(--color-paper-border)]">
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
                 <Link href="/settings" className="block w-full">
                   Settings
                 </Link>
               </Menu.Item>
 
-              {/* Logout */}
-              <Menu.Item className="px-4 py-3 text-body-editorial text-[var(--color-paper-ink)] hover:bg-[var(--color-paper-border)] cursor-pointer transition-colors border-t border-[var(--color-paper-border)]">
-                  <button onClick={() => {
-                    authClient.signOut()
-                    router.refresh()
-                  }} type="submit" className="block w-full text-left">
-                    Logout
-                  </button>
+              <Menu.Item className="px-4 py-3 text-body-editorial text-paper-ink hover:bg-paper-border cursor-pointer transition-colors border-t border-paper-border">
+                <button
+                  onClick={() => {
+                    authClient.signOut();
+                    router.refresh();
+                  }}
+                  type="submit"
+                  className="block w-full text-left"
+                >
+                  Logout
+                </button>
               </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>

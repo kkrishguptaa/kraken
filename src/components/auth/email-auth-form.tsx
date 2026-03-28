@@ -21,7 +21,6 @@ export function EmailAuthForm() {
   const {
     register,
     handleSubmit,
-    setError,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<EmailAuthFormValues>({
@@ -48,9 +47,9 @@ export function EmailAuthForm() {
       <div className="space-y-6">
         {/* Auth method selection */}
         <div className="space-y-3">
-          <label className="block text-xs font-medium text-paper-ink">
+          <div className="block text-xs font-medium text-paper-ink">
             Authentication method
-          </label>
+          </div>
 
           <RadioGroup
             value={authMethod}
@@ -58,7 +57,7 @@ export function EmailAuthForm() {
             className="space-y-3"
           >
             {/* OTP Radio */}
-            <label
+            <div
               className={[
                 "flex cursor-pointer items-start gap-3 rounded border-2 p-4 transition",
                 authMethod === "otp"
@@ -81,10 +80,10 @@ export function EmailAuthForm() {
                   next screen
                 </div>
               </div>
-            </label>
+            </div>
 
             {/* Magic Link Radio */}
-            <label
+            <div
               className={[
                 "flex cursor-pointer items-start gap-3 rounded border-2 p-4 transition",
                 authMethod === "magic-link"
@@ -103,10 +102,11 @@ export function EmailAuthForm() {
                   Magic Link
                 </div>
                 <div className="mt-1 text-xs text-paper-muted">
-                  Get a secure link sent to your email that signs you in instantly
+                  Get a secure link sent to your email that signs you in
+                  instantly
                 </div>
               </div>
-            </label>
+            </div>
           </RadioGroup>
         </div>
 
@@ -155,9 +155,15 @@ export function EmailAuthForm() {
               ].join(" ")}
               {...register("email", {
                 required: "Email is required.",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Enter a valid email address.",
+                validate: (email) => {
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  if (!emailRegex.test(email)) {
+                    return "Enter a valid email address.";
+                  }
+                  if (email.length > 254) {
+                    return "Email address is too long.";
+                  }
+                  return true;
                 },
               })}
             />

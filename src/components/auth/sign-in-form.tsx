@@ -37,7 +37,9 @@ export function SignInForm() {
         <p className="text-xs uppercase tracking-[0.2em] text-paper-muted">
           WELCOME BACK
         </p>
-        <h1 className="font-serif text-3xl leading-tight">Sign in to your account</h1>
+        <h1 className="font-serif text-3xl leading-tight">
+          Sign in to your account
+        </h1>
       </div>
 
       <div className="space-y-4">
@@ -108,7 +110,9 @@ export function SignInForm() {
                 "w-full cursor-text border bg-white px-3 py-2 text-sm outline-none transition",
                 "border-paper-border text-paper-ink placeholder:text-paper-muted/50",
                 "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                errors.email ? "border-red-600 focus:border-red-600 focus:ring-red-200" : "",
+                errors.email
+                  ? "border-red-600 focus:border-red-600 focus:ring-red-200"
+                  : "",
               ].join(" ")}
               {...register("email", {
                 required: "Email is required.",
@@ -148,7 +152,9 @@ export function SignInForm() {
                   "w-full cursor-text border bg-white px-3 py-2 pr-16 text-sm outline-none transition",
                   "border-paper-border text-paper-ink",
                   "focus:border-paper-accent focus:ring-2 focus:ring-[rgb(106_64_32_/_0.2)]",
-                  errors.password ? "border-red-600 focus:border-red-600 focus:ring-red-200" : "",
+                  errors.password
+                    ? "border-red-600 focus:border-red-600 focus:ring-red-200"
+                    : "",
                 ].join(" ")}
                 {...register("password", {
                   required: "Password is required.",

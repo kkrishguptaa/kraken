@@ -10,8 +10,12 @@ import {
   twoFactor,
   username,
 } from "better-auth/plugins";
+import { jsx } from "react/jsx-runtime";
 import * as schema from "@/db/schema";
+import { AuthMagicLinkEmail } from "@/emails/auth-magic-link-email";
+import { AuthOtpEmail } from "@/emails/auth-otp-email";
 import { db } from "@/lib/db";
+import { getFromEmail, getResendClient } from "@/lib/resend";
 
 export const auth = betterAuth({
   emailAndPassword: {
@@ -31,17 +35,43 @@ export const auth = betterAuth({
     twoFactor(),
     username(),
     magicLink({
-      async sendMagicLink({ email, token, url, metadata }, ctx) {},
+      async sendMagicLink({ email, url }) {
+        const resend = getResendClient();
+        if (!resend) {
+          return;
+        }
+
+        await resend.emails.send({
+          from: getFromEmail(),
+          to: email,
+          subject: "Sign in to Kraken",
+          react: jsx(AuthMagicLinkEmail, {
+            url,
+          }),
+        });
+      },
     }),
     emailOTP({
       async sendVerificationOTP({ email, otp, type }) {
-        if (type === "sign-in") {
-          // Send the OTP for sign in
-        } else if (type === "email-verification") {
-          // Send the OTP for email verification
-        } else {
-          // Send the OTP for password reset
+        const resend = getResendClient();
+        if (!resend) {
+          return;
         }
+
+        await resend.emails.send({
+          from: getFromEmail(),
+          to: email,
+          subject:
+            type === "email-verification"
+              ? "Verify your email"
+              : type === "sign-in"
+                ? "Your sign in code"
+                : "Your verification code",
+          react: jsx(AuthOtpEmail, {
+            otp,
+            type,
+          }),
+        });
       },
     }),
     captcha({

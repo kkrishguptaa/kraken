@@ -5,12 +5,6 @@ interface EditorialGridProps {
   className?: string;
 }
 
-/**
- * Masonry editorial grid with varied card sizes for newspaper aesthetic
- * Dividing lines handled by grid divide utilities (not card borders)
- * Uses CSS Grid with auto-flow to create dynamic layouts
- * Responsive: 1 column mobile → 2 columns tablet → 4 columns desktop
- */
 export function EditorialGrid({
   children,
   className = "",
@@ -26,8 +20,8 @@ export function EditorialGrid({
         auto-rows-[240px]
         gap-0
         divide-x divide-y border
-        divide-[var(--color-paper-border)]
-        border-[var(--color-paper-border)]
+        divide-paper-border
+        border-paper-border
         ${className}
       `}
     >

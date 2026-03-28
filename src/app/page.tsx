@@ -1,71 +1,47 @@
-import {
-  ArticleCard,
-  EditorialGrid,
-  Masthead,
-} from "@/components/editorial";
 import { getSession } from "@/hooks/session";
-import { getRecentUpdates } from "@/lib/queries/updates";
-import { assignCardSizes, getCardGridClasses } from "@/lib/utils/card-layout";
-import Link from "next/link";
-import { useOnboarded } from "@/hooks/onboarded";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await getSession();
 
-  if (session) {
-    // biome-ignore lint/correctness/useHookAtTopLevel: These are not exactly hooks lol
-    await useOnboarded();
-  }
-
-  const articles = await getRecentUpdates(12);
-
-  // Assign card sizes with weighted randomization
-  const cardSizes = assignCardSizes(articles.length);
-
   return (
-    <main className="min-h-screen bg-[var(--color-paper-base)]">
-      {/* Container with consistent max-width and padding */}
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        {/* Masthead */}
-        <div className="py-8">
-          <Masthead
-            userName={session?.user?.name}
-            userImage={session?.user?.image}
-            userUsername={session?.user?.username}
-            showAvatar={!!session}
-            className="mb-8"
-          />
-        </div>
+    <main className="min-h-screen bg-paper-base">
+      <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col justify-center px-6 py-16 md:px-12">
+        <div className="space-y-8 border border-paper-border bg-white/70 p-8 md:p-12">
+          <p className="text-meta text-paper-muted">KRAKEN</p>
+          <h1 className="font-family-display text-[clamp(2.2rem,7vw,5rem)] leading-[0.95] text-paper-ink">
+            Write your life in editions for people who matter.
+          </h1>
+          <p className="max-w-3xl text-body-editorial text-paper-muted">
+            Kraken is an editorial social platform where updates are deliberate,
+            personal, and human. Publish daily notes, weekly letters, or monthly
+            essays to your publication and let people subscribe by email.
+          </p>
 
-        {/* Masonry grid with varied card sizes */}
-        {articles.length > 0 && (
-          <EditorialGrid>
-            {articles.map((article, index) => {
-              const size = cardSizes[index];
-              const gridClasses = getCardGridClasses(size);
-              return (
-                <Link
-                  key={article.id}
-                  href={`/@${article.userUsername}/${article.id}`}
-                  className={`${gridClasses} h-full hover:opacity-80 transition-opacity`}
-                >
-                  <ArticleCard article={article} size={size} />
-                </Link>
-              );
-            })}
-          </EditorialGrid>
-        )}
-
-        {/* Empty state */}
-        {articles.length === 0 && (
-          <div className="text-center py-16 px-6">
-            <p className="text-body-editorial text-[var(--color-paper-muted)]">
-              No updates yet. Check back soon.
-            </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={session ? "/feed" : "/auth/sign-up"}
+              className="border border-paper-ink px-5 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
+            >
+              {session ? "Open feed" : "Start writing"}
+            </a>
+            <a
+              href={session ? "/editorial" : "/auth/sign-in"}
+              className="border border-paper-border px-5 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border"
+            >
+              {session ? "Go to editorial" : "Sign in"}
+            </a>
+            {session?.user?.username ? (
+              <a
+                href={`/@${session.user.username}`}
+                className="text-meta-small underline underline-offset-2 text-paper-ink"
+              >
+                Visit your publication
+              </a>
+            ) : null}
           </div>
-        )}
+        </div>
       </div>
     </main>
   );

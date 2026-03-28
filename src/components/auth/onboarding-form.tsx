@@ -19,7 +19,9 @@ export function OnboardingForm() {
   const router = useRouter();
   const [destination, setDestination] = useState<"home" | "editorial">("home");
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>("idle");
-  const [checkingTimeout, setCheckingTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [checkingTimeout, setCheckingTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
 
   const {
     register,
@@ -89,7 +91,7 @@ export function OnboardingForm() {
             message: "This username is already taken.",
           });
         }
-      } catch (error) {
+      } catch (_error) {
         setUsernameStatus("idle");
       }
     }, 500); // 500ms debounce
@@ -99,7 +101,7 @@ export function OnboardingForm() {
     return () => {
       clearTimeout(timeout);
     };
-  }, [username, setError, clearErrors]);
+  }, [username, setError, clearErrors, checkingTimeout]);
 
   return (
     <div className="space-y-6">
@@ -108,7 +110,9 @@ export function OnboardingForm() {
         <p className="text-xs uppercase tracking-[0.2em] text-paper-muted">
           WELCOME TO KRAKEN
         </p>
-        <h1 className="font-serif text-3xl leading-tight">Complete your profile</h1>
+        <h1 className="font-serif text-3xl leading-tight">
+          Complete your profile
+        </h1>
         <p className="text-sm text-paper-muted">
           Choose your username and display name to get started
         </p>
@@ -249,7 +253,7 @@ export function OnboardingForm() {
               )}
 
               {/* Live URL preview */}
-              {username && username.trim() && (
+              {username?.trim() && (
                 <p className="text-xs text-paper-muted">
                   Your URL:{" "}
                   <span className="font-mono text-paper-ink">
@@ -296,7 +300,9 @@ export function OnboardingForm() {
             <strong className="font-medium text-paper-ink">
               What's the difference?
             </strong>{" "}
-            Start Writing takes you directly to the editorial page where you can create your first Kraken. Go to Home shows you the feed and your profile.
+            Start Writing takes you directly to the editorial page where you can
+            create your first Kraken. Go to Home shows you the feed and your
+            profile.
           </p>
         </div>
       </div>

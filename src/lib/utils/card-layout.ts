@@ -6,10 +6,10 @@ import type { CardSize } from "@/components/editorial";
  * Creates a consistent magazine aesthetic without wide-short cards
  */
 const CARD_SIZE_PATTERN: CardSize[] = [
-  "tall",      // 1x width, 2x height
-  "standard",  // 1x width, 1x height
-  "standard",  // 1x width, 1x height
-  "wide",      // 2x width, 1x height
+  "tall", // 1x width, 2x height
+  "standard", // 1x width, 1x height
+  "standard", // 1x width, 1x height
+  "wide", // 2x width, 1x height
 ];
 
 /**

@@ -4,10 +4,7 @@ import { Button } from "@base-ui/react/button";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import {
-  sendSignInOTP,
-  signInWithEmailOTP,
-} from "@/actions/auth-actions";
+import { sendSignInOTP, signInWithEmailOTP } from "@/actions/auth-actions";
 
 export function VerifyEmailForm() {
   const router = useRouter();
@@ -62,7 +59,7 @@ export function VerifyEmailForm() {
 
   const handleKeyDown = (
     index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     // Handle backspace
     if (e.key === "Backspace") {
@@ -146,8 +143,9 @@ export function VerifyEmailForm() {
         </h1>
         <p className="text-sm text-paper-muted">
           We sent a 6-digit code to{" "}
-          <span className="font-medium text-paper-ink">{email || "your email"}</span>
-          {" "}
+          <span className="font-medium text-paper-ink">
+            {email || "your email"}
+          </span>{" "}
           <Link
             href="/auth/sign-in"
             className="text-paper-ink underline underline-offset-2 hover:text-black"
@@ -161,13 +159,13 @@ export function VerifyEmailForm() {
       <form className="space-y-6" onSubmit={handleSubmit}>
         {/* 6 Digit Inputs */}
         <div className="space-y-3">
-          <label className="block text-center text-xs font-medium uppercase tracking-[0.2em] text-paper-muted">
+          <div className="block text-center text-xs font-medium uppercase tracking-[0.2em] text-paper-muted">
             VERIFICATION CODE
-          </label>
+          </div>
           <div className="flex justify-center gap-2 sm:gap-3">
             {digits.map((digit, index) => (
               <input
-                key={index}
+                key={`digit-${digit}`}
                 ref={inputRefs[index]}
                 type="text"
                 inputMode="numeric"

@@ -5,4 +5,3 @@ export { DateDisplay } from "./DateDisplay";
 export { EditorialGrid } from "./EditorialGrid";
 export { Masthead } from "./Masthead";
 export { UserAvatar } from "./UserAvatar";
-

@@ -8,7 +8,7 @@ export interface Article {
   headline: string;
   content: string;
   publishedAt: Date | string;
-  readTime: number; // in minutes
+  readTime: number;
   userId: string;
   userUsername?: string;
 }
@@ -23,14 +23,10 @@ interface ArticleCardProps {
 
 const LINE_CLAMP_CLASS_MAP: Record<CardSize, string> = {
   standard: "line-clamp-6",
-  wide: "line-clamp-10",
-  tall: "line-clamp-[20]",
+  wide: "line-clamp-12",
+  tall: "line-clamp-30",
 };
 
-/**
- * Masonry grid article card - no borders, grid handles dividers
- * Size variants: wide (2x1), standard (1x1), tall (1x2)
- */
 export function ArticleCard({
   article,
   size = "standard",
@@ -40,48 +36,29 @@ export function ArticleCard({
 
   return (
     <article
-      className={`flex flex-col h-full bg-[var(--color-paper-base)] p-5 lg:p-6 ${className}`}
+      className={`flex h-full flex-col bg-paper-base p-6 lg:p-8 ${className}`}
     >
-      {/* Header: Publication name + Edition */}
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <span className="text-meta text-[var(--color-paper-muted)] uppercase truncate">
-          {article.publicationName}
-        </span>
-        <span className="text-meta-small text-[var(--color-paper-muted)] whitespace-nowrap">
-          ED. #{article.editionNumber}
-        </span>
-      </div>
-
-      {/* Divider after publication */}
-      <hr className="border-t border-[var(--color-paper-border)] mb-3" />
-
-      {/* Headline */}
-      <h2 className="text-headline leading-tight line-clamp-3 mb-3">
+      <h2 className="text-headline leading-tight text-balance text-paper-ink underline-offset-8 group-hover:underline">
         {article.headline}
       </h2>
 
-      {/* Date */}
-      <div className="flex justify-end mb-2">
-        <DateDisplay date={article.publishedAt} />
+      <div className="my-4 flex justify-end">
+        <DateDisplay
+          date={article.publishedAt}
+          className="text-meta text-paper-muted"
+        />
       </div>
 
-      {/* Divider after date */}
-      <hr className="border-t border-[var(--color-paper-border)] mb-3" />
+      <hr className="mb-4 border-t border-paper-border" />
 
-      {/* Content - text with line-clamp based on card size */}
-      <div className="flex-1 overflow-hidden mb-4">
+      <div className="mb-2 flex-1 overflow-hidden">
         <MarkdownRender
-          className={`text-body-editorial text-[var(--color-paper-ink)] text-justify leading-relaxed ${lineClampClass}`}
+          className={`max-w-none text-body-editorial leading-relaxed text-paper-ink prose-p:my-0 prose-headings:hidden prose-hr:hidden prose-pre:hidden prose-blockquote:hidden ${lineClampClass}`}
         >
           {article.content}
         </MarkdownRender>
       </div>
 
-      {/* Footer: Edition + Read time */}
-      <div className="flex items-center justify-between text-meta-small text-[var(--color-paper-muted)] pt-2 border-t border-[var(--color-paper-border)]">
-        <span>Edition #{article.editionNumber}</span>
-        <span>{article.readTime} min read</span>
-      </div>
     </article>
   );
 }

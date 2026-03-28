@@ -11,6 +11,22 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/@:username/:path*",
+        destination: "/~/:username/:path*",
+      },
+      {
+        source: "/@:username",
+        destination: "/~/:username",
+      },
+      {
+        source: "/~:username",
+        destination: "/@/:username",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

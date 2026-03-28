@@ -1,36 +1,10 @@
 import type { Metadata } from "next";
-import {
-  Cormorant_Garamond,
-  Crimson_Text,
-  Geist,
-  Geist_Mono,
-  Inter,
-} from "next/font/google";
+import { Cormorant_Garamond, Crimson_Text } from "next/font/google";
 import "@/globals.css";
-import { useAuthenticated } from "@/hooks/authenticated";
-import { getSession } from "@/hooks/session";
-import { useOnboarded } from "@/hooks/onboarded";
+import "@uiw/react-md-editor/markdown-editor.css";
 
 export const dynamic = "force-dynamic";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-// UI font for controls and chrome
-const inter = Inter({
-  variable: "--font-ui",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-// Editorial serif for display text (masthead, large headlines)
 const cormorantGaramond = Cormorant_Garamond({
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
@@ -39,7 +13,6 @@ const cormorantGaramond = Cormorant_Garamond({
   display: "swap",
 });
 
-// Editorial serif for body text and smaller headlines
 const crimsonText = Crimson_Text({
   weight: ["400", "600", "700"],
   style: ["normal", "italic"],
@@ -62,7 +35,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${cormorantGaramond.variable} ${crimsonText.variable} h-full antialiased`}
+      className={`${cormorantGaramond.variable} ${crimsonText.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

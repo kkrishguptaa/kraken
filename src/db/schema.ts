@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import {
@@ -59,7 +60,7 @@ export const issues = pgTable(
     }),
     title: text("title").notNull(),
     content: text("content").notNull(),
-    editionNumber: integer("edition_number"),
+    editionNumber: integer("edition_number").notNull(),
     status: text("status").notNull().default("draft"),
     publishedAt: timestamp("published_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -72,6 +73,10 @@ export const issues = pgTable(
     check(
       "issues_status_check",
       sql`${table.status} IN ('draft', 'published')`,
+    ),
+    uniqueIndex("issues_publication_id_edition_number_unique").on(
+      table.publicationId,
+      table.editionNumber,
     ),
   ],
 );

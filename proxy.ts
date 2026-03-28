@@ -1,22 +1,61 @@
-import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-
-export async function proxy(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  // THIS IS NOT SECURE!
-  // This is the recommended approach to optimistically redirect users
-  // We recommend handling auth checks in each page/route
-  if (!session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+function isPrimaryHost(hostname: string): boolean {
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return true;
   }
 
-  return NextResponse.next();
+  if (hostname.endsWith(".vercel.app")) {
+    return true;
+  }
+
+  const appUrl = process.env.BETTER_AUTH_URL;
+  if (!appUrl) {
+    return false;
+  }
+
+  try {
+    const appHost = new URL(appUrl).hostname;
+    return hostname === appHost;
+  } catch {
+    return false;
+  }
+}
+
+export async function proxy(request: NextRequest) {
+  const hostHeader = request.headers.get("host") || "";
+  const hostname = hostHeader.split(":")[0];
+
+  if (isPrimaryHost(hostname)) {
+    return NextResponse.next();
+  }
+
+  const pathname = request.nextUrl.pathname;
+  const search = request.nextUrl.search;
+  const lookupUrl = new URL(
+    `/api/internal/domain-lookup?domain=${encodeURIComponent(hostname)}`,
+    request.url,
+  );
+
+  const lookup = await fetch(lookupUrl, {
+    headers: {
+      "x-kraken-proxy": "1",
+    },
+  });
+
+  if (!lookup.ok) {
+    return NextResponse.next();
+  }
+
+  const payload = (await lookup.json()) as { username?: string };
+  if (!payload.username) {
+    return NextResponse.next();
+  }
+
+  const rewriteUrl = new URL(`/@${payload.username}${pathname}${search}`, request.url);
+
+  return NextResponse.rewrite(rewriteUrl);
 }
 
 export const config = {
-  matcher: ["/dashboard"], // Specify the routes the middleware applies to
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

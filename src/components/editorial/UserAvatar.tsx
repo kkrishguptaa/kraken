@@ -32,7 +32,6 @@ export function UserAvatar({
   const initials = getInitials(name);
   const config = sizeConfig[size];
 
-  // If user has an image, show it with Next.js Image optimization
   if (image) {
     return (
       <Image
@@ -51,7 +50,6 @@ export function UserAvatar({
     );
   }
 
-  // Otherwise show initials
   return (
     <div
       className={`
@@ -61,7 +59,7 @@ export function UserAvatar({
         bg-[#9c9485]
         text-white
         flex items-center justify-center
-        font-[var(--font-family-ui)]
+        font-family-body
         font-medium
         tracking-wide
         shadow-inner

@@ -2,27 +2,33 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
+/* --------------------------------------------------------------------------
+   Design Tokens
+   -------------------------------------------------------------------------- */
 @theme {
+  /* Paper palette */
   --color-paper-base: #f6f1e7;
   --color-paper-ink: #16120f;
   --color-paper-muted: #645d52;
   --color-paper-border: #d4cab5;
   --color-paper-accent: #6a4020;
 
-  /* Editorial Typography Scale */
+  /* Editorial typography */
   --font-family-display: var(--font-editorial-display);
   --font-family-body: var(--font-editorial-body);
-  --font-family-ui: var(--font-geist-sans);
 
-  /* Editorial Spacing Scale */
-  --space-editorial-xs: 0.25rem; /* 4px - tight metadata */
-  --space-editorial-sm: 0.5rem; /* 8px - compact spacing */
-  --space-editorial-md: 1rem; /* 16px - standard gap */
-  --space-editorial-lg: 1.5rem; /* 24px - section breathing room */
-  --space-editorial-xl: 2.5rem; /* 40px - major sections */
-  --space-editorial-2xl: 4rem; /* 64px - page-level spacing */
+  /* Spacing rhythm */
+  --space-editorial-xs: 0.25rem;
+  --space-editorial-sm: 0.5rem;
+  --space-editorial-md: 1rem;
+  --space-editorial-lg: 1.5rem;
+  --space-editorial-xl: 2.5rem;
+  --space-editorial-2xl: 4rem;
 }
 
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
 @layer base {
   :root {
     color-scheme: light;
@@ -31,6 +37,7 @@
   body {
     isolation: isolate;
     position: relative;
+    font-family: var(--font-family-body);
     background-color: var(--color-paper-base);
     color: var(--color-paper-ink);
     background-image:
@@ -48,6 +55,9 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   Reusable Components + Typographic Utilities
+   -------------------------------------------------------------------------- */
 @layer components {
   .auth-paper-grain {
     background-image:
@@ -66,7 +76,6 @@
       );
   }
 
-  /* Editorial Typography Classes */
   .text-masthead {
     font-family: var(--font-family-display);
     font-size: clamp(3rem, 8vw, 6rem);
@@ -98,7 +107,7 @@
   }
 
   .text-meta {
-    font-family: var(--font-family-ui);
+    font-family: var(--font-family-body);
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.4;
@@ -107,7 +116,7 @@
   }
 
   .text-meta-small {
-    font-family: var(--font-family-ui);
+    font-family: var(--font-family-body);
     font-size: 0.6875rem;
     font-weight: 500;
     line-height: 1.4;
@@ -115,7 +124,6 @@
     text-transform: uppercase;
   }
 
-  /* Editorial Rules & Borders */
   .rule-thin {
     border-top: 1px solid var(--color-paper-border);
   }
@@ -124,7 +132,6 @@
     border-top: 2px solid var(--color-paper-ink);
   }
 
-  /* Editorial Grid Utilities */
   .editorial-grid {
     display: grid;
     gap: var(--space-editorial-md);
@@ -138,12 +145,10 @@
     }
   }
 
-  /* Card borders */
   .card-border {
     border: 1px solid var(--color-paper-border);
   }
 
-  /* Staggered animation for cards */
   .animate-stagger > * {
     animation: fadeInUp 0.6s ease-out forwards;
     opacity: 0;

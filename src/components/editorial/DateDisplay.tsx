@@ -14,10 +14,7 @@ export function DateDisplay({ date, className = "" }: DateDisplayProps) {
   const year = String(dateObj.getFullYear()).slice(-2);
 
   return (
-    <time
-      dateTime={dateObj.toISOString()}
-      className={`${className}`}
-    >
+    <time dateTime={dateObj.toISOString()} className={`${className}`}>
       {day}/{month}/{year}
     </time>
   );

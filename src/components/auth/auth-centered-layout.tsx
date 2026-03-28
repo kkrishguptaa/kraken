@@ -17,7 +17,10 @@ export function AuthCenteredLayout({
       {/* Header */}
       <div className="border-b border-paper-border bg-paper-base px-6 py-4">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
-          <Link href="/" className="font-serif text-lg font-medium tracking-tight">
+          <Link
+            href="/"
+            className="font-serif text-lg font-medium tracking-tight"
+          >
             KRAKEN NEWS
           </Link>
           <Link
