@@ -16,6 +16,7 @@ import {
   authPrimaryButtonClassName,
   getAuthInputClassName,
 } from "@/components/auth/auth-styles";
+import { Button as UIButton } from "@/components/ui/button";
 
 type SignUpFormValues = {
   name: string;
@@ -171,13 +172,14 @@ export function SignUpForm() {
                   },
                 })}
               />
-              <button
+              <UIButton
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-paper-muted hover:text-paper-ink"
+                variant="underline"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-paper-muted hover:text-paper-ink px-0 py-0"
               >
                 {showPassword ? "Hide" : "Show"}
-              </button>
+              </UIButton>
             </div>
             {errors.password?.message ? (
               <p className="text-xs text-red-700">{errors.password.message}</p>

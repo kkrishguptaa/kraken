@@ -5,6 +5,7 @@ import {
   updateSubscriptionNotifications,
 } from "@/actions/subscription-actions";
 import { Masthead } from "@/components/editorial";
+import { Button } from "@/components/ui/button";
 import { publications, subscribers, user } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
@@ -77,7 +78,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
           </header>
 
           {notice ? (
-            <div className="border border-paper-border bg-white/70 px-4 py-3 text-meta-small text-paper-ink">
+            <div className="border border-paper-border bg-white/70 px-4 py-3 text-sm text-paper-ink">
               {notice}
             </div>
           ) : null}
@@ -103,12 +104,9 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                 placeholder="@username"
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <button
-                type="submit"
-                className="border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-              >
+              <Button variant="primary" className="text-sm">
                 Subscribe
-              </button>
+              </Button>
             </div>
           </form>
 
@@ -132,7 +130,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                     <h2 className="font-family-display text-2xl leading-tight text-paper-ink">
                       {row.publicationName}
                     </h2>
-                    <p className="text-meta-small text-paper-muted">
+                    <p className="text-sm text-paper-muted">
                       @{row.publicationUsername}
                     </p>
                   </div>
@@ -145,24 +143,18 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
                         name="enabled"
                         value={row.emailNotificationsEnabled ? "false" : "true"}
                       />
-                      <button
-                        type="submit"
-                        className="border border-paper-border px-3 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border"
-                      >
+                      <Button variant="secondary" className="text-sm">
                         {row.emailNotificationsEnabled
                           ? "Disable emails"
                           : "Enable emails"}
-                      </button>
+                      </Button>
                     </form>
 
                     <form action={removeSubscription}>
                       <input type="hidden" name="subscriberId" value={row.id} />
-                      <button
-                        type="submit"
-                        className="border border-paper-ink px-3 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-                      >
+                      <Button variant="danger" className="text-sm">
                         Unsubscribe
-                      </button>
+                      </Button>
                     </form>
                   </div>
                 </div>

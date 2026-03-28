@@ -139,7 +139,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                 A living publication for regular updates, archived by edition
                 and meant to be read in sequence.
               </p>
-              <div className="mt-5 flex flex-wrap gap-3 text-meta-small text-paper-ink">
+              <div className="mt-5 flex flex-wrap gap-3 text-sm text-paper-ink">
                 <span className="border border-paper-border px-3 py-2">
                   @{profile.username}
                 </span>
@@ -155,13 +155,13 @@ export default async function PublicProfilePage({ params }: PageProps) {
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
-                  className="border border-paper-ink bg-paper-ink px-4 py-2 text-meta-small text-paper-base transition hover:border-paper-accent hover:bg-paper-accent"
+                  className="border border-paper-ink bg-paper-ink px-4 py-2 text-sm text-paper-base transition hover:border-paper-accent hover:bg-paper-accent"
                   href={`/@${profile.username}`}
                 >
                   Open publication
                 </Link>
                 <Link
-                  className="border border-paper-border px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border/50"
+                  className="border border-paper-border px-4 py-2 text-sm text-paper-ink transition hover:bg-paper-border/50"
                   href={`/feed`}
                 >
                   Browse the feed
@@ -200,7 +200,7 @@ export default async function PublicProfilePage({ params }: PageProps) {
                   <p className="font-family-display text-2xl leading-tight text-paper-ink">
                     {issue.title}
                   </p>
-                  <p className="mt-1 text-meta-small text-paper-muted">
+                  <p className="mt-1 text-sm text-paper-muted">
                     Edition #{issue.editionNumber}
                   </p>
                 </Link>

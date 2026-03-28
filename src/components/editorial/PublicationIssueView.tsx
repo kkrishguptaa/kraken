@@ -73,7 +73,7 @@ export function PublicationIssueView({
                   {issue.headline}
                 </h1>
 
-                <div className="mt-5 flex flex-wrap items-center gap-4 text-meta-small text-paper-muted">
+                <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-paper-muted">
                   {issue.userUsername && (
                     <Link
                       href={`/@${issue.userUsername}`}
@@ -99,7 +99,7 @@ export function PublicationIssueView({
 
             <aside className="space-y-4 lg:sticky lg:top-8">
               <div className="border border-paper-border bg-white/60 p-5">
-                <p className="text-meta-small text-paper-muted">Publication</p>
+                <p className="text-sm text-paper-muted">Publication</p>
                 <p className="mt-3 font-family-display text-2xl leading-tight text-paper-ink">
                   {publicationTitle}
                 </p>

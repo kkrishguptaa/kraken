@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { subscribeToPublication } from "@/actions/subscription-actions";
+import { Button } from "@/components/ui/button";
 
 type SubscriptionBoxProps = {
   publicationUsername: string;
@@ -43,13 +44,11 @@ export function SubscriptionBox({
         Get every new edition in your inbox.
       </p>
 
-      {notice ? (
-        <p className="mt-4 text-meta-small text-paper-ink">{notice}</p>
-      ) : null}
+      {notice ? <p className="mt-4 text-sm text-paper-ink">{notice}</p> : null}
 
       <div className="mt-5">
         {isOwnPublication ? (
-          <p className="text-meta-small text-paper-muted">
+          <p className="text-sm text-paper-muted">
             This is your publication profile.
           </p>
         ) : null}
@@ -73,14 +72,11 @@ export function SubscriptionBox({
                 placeholder="your@email.com"
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <button
-                type="submit"
-                className="inline-block border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-              >
+              <Button variant="primary" className="text-sm">
                 Subscribe
-              </button>
+              </Button>
             </form>
-            <p className="text-meta-small text-paper-muted">
+            <p className="text-sm text-paper-muted">
               Already have an account?{" "}
               <Link
                 href="/auth/sign-in"
@@ -94,12 +90,12 @@ export function SubscriptionBox({
 
         {!isOwnPublication && isAuthenticated && isSubscribed ? (
           <div className="space-y-2">
-            <p className="text-meta-small text-paper-muted">
+            <p className="text-sm text-paper-muted">
               You are subscribed to @{publicationUsername}.
             </p>
             <Link
               href="/subscriptions"
-              className="inline-block border border-paper-border px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border"
+              className="inline-block border border-paper-border px-4 py-2 text-sm text-paper-ink transition hover:bg-paper-border"
             >
               Manage subscriptions
             </Link>
@@ -114,12 +110,9 @@ export function SubscriptionBox({
               value={publicationUsername}
             />
             <input type="hidden" name="returnTo" value={returnTo} />
-            <button
-              type="submit"
-              className="inline-block border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-            >
+            <Button variant="primary" className="text-sm">
               Subscribe to @{publicationUsername}
-            </button>
+            </Button>
           </form>
         ) : null}
       </div>

@@ -100,6 +100,24 @@ function revalidateEditorialPaths(
   }
 }
 
+function resolvePublishTimestamp(publishedAt?: string): Date {
+  if (!publishedAt) {
+    return new Date();
+  }
+
+  const parsed = new Date(publishedAt);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("Publish date is invalid.");
+  }
+
+  if (parsed.getTime() > Date.now()) {
+    throw new Error("Publish date cannot be in the future.");
+  }
+
+  return parsed;
+}
+
 export async function createEditorialDraft(): Promise<EditorialIssueRecord> {
   const session = await useOnboarded();
   const username = getRequiredUsername(session);
@@ -194,9 +212,11 @@ export async function publishEditorialIssue(input: {
   issueId: string;
   title: string;
   content: string;
+  publishedAt?: string;
 }): Promise<EditorialIssueRecord> {
   const session = await useOnboarded();
   const username = getRequiredUsername(session);
+  const publishTimestamp = resolvePublishTimestamp(input.publishedAt);
 
   // Verify issue exists and belongs to user
   const existingIssue = await db
@@ -229,7 +249,7 @@ export async function publishEditorialIssue(input: {
       title: input.title,
       content: input.content,
       status: "published",
-      publishedAt: new Date(),
+      publishedAt: publishTimestamp,
       updatedAt: new Date(),
     })
     .where(

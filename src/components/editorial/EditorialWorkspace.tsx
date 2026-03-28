@@ -10,11 +10,22 @@ import {
   saveEditorialIssue,
   testSendIssueEmail,
 } from "@/actions/editorial-actions";
+import { Button } from "@/components/ui/button";
 
 type EditorialWorkspaceProps = {
   username: string;
   initialIssues: EditorialIssueRecord[];
 };
+
+function toLocalDateTimeInputValue(value: Date): string {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  const hours = String(value.getHours()).padStart(2, "0");
+  const minutes = String(value.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
 
 function formatStamp(value: Date | null): string {
   if (!value) {
@@ -37,6 +48,7 @@ export function EditorialWorkspace({
   );
   const [title, setTitle] = useState(initialIssues[0]?.title ?? "");
   const [content, setContent] = useState(initialIssues[0]?.content ?? "");
+  const [publishDateLocal, setPublishDateLocal] = useState("");
   const [notice, setNotice] = useState<string>("");
   const [isPending, startTransition] = useTransition();
 
@@ -76,6 +88,11 @@ export function EditorialWorkspace({
     setActiveIssueId(issue.id);
     setTitle(issue.title);
     setContent(issue.content);
+    setPublishDateLocal(
+      issue.status === "published" && issue.publishedAt
+        ? toLocalDateTimeInputValue(issue.publishedAt)
+        : "",
+    );
     setNotice("");
   }
 
@@ -125,12 +142,26 @@ export function EditorialWorkspace({
       return;
     }
 
+    let publishTimestamp: string | undefined;
+
+    if (publishDateLocal) {
+      const parsedLocalDate = new Date(publishDateLocal);
+
+      if (Number.isNaN(parsedLocalDate.getTime())) {
+        setNotice("Publish date is invalid.");
+        return;
+      }
+
+      publishTimestamp = parsedLocalDate.toISOString();
+    }
+
     startTransition(async () => {
       try {
         const published = await publishEditorialIssue({
           issueId: activeIssue.id,
           title: title.trim() || "Untitled Issue",
           content,
+          publishedAt: publishTimestamp,
         });
 
         setIssues((prev) =>
@@ -168,18 +199,18 @@ export function EditorialWorkspace({
       <aside className="space-y-6 border border-paper-border bg-white/60 p-5 lg:sticky lg:top-8 lg:h-fit">
         <div className="space-y-3">
           <p className="text-meta text-paper-muted">Issue Archive</p>
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            className="w-full text-sm"
             onClick={handleCreateDraft}
             disabled={isPending}
-            className="w-full border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base disabled:opacity-60"
           >
             New draft
-          </button>
+          </Button>
         </div>
 
         <div className="space-y-2">
-          <p className="text-meta-small text-paper-muted">Drafts</p>
+          <p className="text-sm text-paper-muted">Drafts</p>
           {draftIssues.length === 0 ? (
             <p className="text-sm text-paper-muted">No drafts yet.</p>
           ) : (
@@ -197,7 +228,7 @@ export function EditorialWorkspace({
                 <p className="line-clamp-2 text-body-editorial text-paper-ink">
                   {issue.title || "Untitled Draft"}
                 </p>
-                <p className="mt-1 text-meta-small text-paper-muted">
+                <p className="mt-1 text-sm text-paper-muted">
                   Ed. #{issue.editionNumber}
                 </p>
               </button>
@@ -206,7 +237,7 @@ export function EditorialWorkspace({
         </div>
 
         <div className="space-y-2">
-          <p className="text-meta-small text-paper-muted">Published</p>
+          <p className="text-sm text-paper-muted">Published</p>
           {publishedIssues.length === 0 ? (
             <p className="text-sm text-paper-muted">Nothing published yet.</p>
           ) : (
@@ -224,7 +255,7 @@ export function EditorialWorkspace({
                 <p className="line-clamp-2 text-body-editorial text-paper-ink">
                   {issue.title || "Untitled Issue"}
                 </p>
-                <p className="mt-1 text-meta-small text-paper-muted">
+                <p className="mt-1 text-sm text-paper-muted">
                   Published {formatStamp(issue.publishedAt)}
                 </p>
               </button>
@@ -241,7 +272,7 @@ export function EditorialWorkspace({
                 <p className="text-meta text-paper-muted">
                   Edition #{activeIssue.editionNumber}
                 </p>
-                <p className="text-meta-small text-paper-muted">
+                <p className="text-sm text-paper-muted">
                   Last updated {formatStamp(activeIssue.updatedAt)}
                 </p>
               </div>
@@ -269,54 +300,73 @@ export function EditorialWorkspace({
             </div>
 
             <div className="flex flex-wrap items-center gap-3 border-t border-paper-border pt-4">
-              <button
-                type="button"
+              <Button
+                variant="primary"
+                className="text-sm"
                 onClick={handleSave}
                 disabled={isPending}
-                className="border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base disabled:opacity-60"
               >
                 {activeIssue.status === "published"
                   ? "Save published changes"
                   : "Save draft"}
-              </button>
+              </Button>
 
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                className="text-sm"
                 onClick={handleTestSend}
                 disabled={isPending}
-                className="border border-paper-border px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border disabled:opacity-60"
               >
                 Test send to me
-              </button>
+              </Button>
 
               {activeIssue.status === "draft" ? (
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={isPending}
-                  className="border border-paper-border px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border disabled:opacity-60"
-                >
-                  Publish issue
-                </button>
+                <>
+                  <div className="flex min-w-64 flex-col gap-1">
+                    <label
+                      htmlFor="publish-date"
+                      className="text-xs text-paper-muted"
+                    >
+                      Publish date (optional)
+                    </label>
+                    <input
+                      id="publish-date"
+                      type="datetime-local"
+                      value={publishDateLocal}
+                      onChange={(event) =>
+                        setPublishDateLocal(event.target.value)
+                      }
+                      className="border border-paper-border bg-paper-base px-2 py-1 text-sm text-paper-ink outline-none focus:border-paper-accent"
+                      disabled={isPending}
+                    />
+                    <p className="text-xs text-paper-muted">
+                      Uses your local timezone. Future dates are not allowed.
+                    </p>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    className="text-sm"
+                    onClick={handlePublish}
+                    disabled={isPending}
+                  >
+                    Publish issue
+                  </Button>
+                </>
               ) : (
-                <span className="text-meta-small text-paper-muted">
-                  Published
-                </span>
+                <span className="text-sm text-paper-muted">Published</span>
               )}
 
               {activeIssue.status === "published" ? (
                 <Link
                   href={`/@${username}/${activeIssue.editionNumber}`}
-                  className="text-meta-small underline underline-offset-2"
+                  className="text-sm underline underline-offset-2"
                 >
                   View published page
                 </Link>
               ) : null}
 
               {notice ? (
-                <p className="ml-auto text-meta-small text-paper-muted">
-                  {notice}
-                </p>
+                <p className="ml-auto text-sm text-paper-muted">{notice}</p>
               ) : null}
             </div>
           </>

@@ -15,6 +15,7 @@ import {
   authHelpCardClassName,
   authPrimaryButtonClassName,
 } from "@/components/auth/auth-styles";
+import { Button as UIButton } from "@/components/ui/button";
 
 export function VerifyEmailForm() {
   const router = useRouter();
@@ -275,18 +276,19 @@ export function VerifyEmailForm() {
 
         <p className="text-center text-sm text-paper-muted">
           {isMagicLink ? "Need another link?" : "Didn't receive it?"}{" "}
-          <button
+          <UIButton
             type="button"
             onClick={handleResendCode}
             disabled={isResending}
-            className="font-medium text-paper-ink underline underline-offset-2 hover:text-black disabled:opacity-50"
+            variant="underline"
+            className="font-medium text-paper-ink underline underline-offset-2 hover:text-black disabled:opacity-50 px-0 py-0 text-sm inline"
           >
             {isResending
               ? "Sending..."
               : isMagicLink
                 ? "Resend magic link"
                 : "Resend code"}
-          </button>
+          </UIButton>
         </p>
       </form>
     </div>

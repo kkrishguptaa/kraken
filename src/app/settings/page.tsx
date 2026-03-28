@@ -8,6 +8,7 @@ import {
   verifyCustomDomain,
 } from "@/actions/settings-actions";
 import { Masthead } from "@/components/editorial";
+import { Button } from "@/components/ui/button";
 import { publications } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
@@ -95,15 +96,12 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                 defaultValue={session.user.name || ""}
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <div className="text-meta-small text-paper-muted">
+              <div className="text-sm text-paper-muted">
                 @{session.user.username}
               </div>
-              <button
-                type="submit"
-                className="border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-              >
+              <Button variant="primary" className="text-sm">
                 Save name
-              </button>
+              </Button>
             </form>
 
             <form
@@ -113,7 +111,7 @@ export default async function SettingsPage({ searchParams }: PageProps) {
               <h2 className="font-family-display text-2xl text-paper-ink">
                 Publication title
               </h2>
-              <p className="text-meta-small text-paper-muted">
+              <p className="text-sm text-paper-muted">
                 This becomes the masthead title for /@{session.user.username}.
               </p>
               <input
@@ -121,12 +119,9 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                 defaultValue={publication?.name || ""}
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <button
-                type="submit"
-                className="border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-              >
+              <Button variant="primary" className="text-sm">
                 Save publication title
-              </button>
+              </Button>
             </form>
           </div>
 
@@ -149,16 +144,13 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                 defaultValue={publication?.customDomain || ""}
                 className="w-full border border-paper-border bg-paper-base px-3 py-2 text-body-editorial text-paper-ink outline-none focus:border-paper-accent"
               />
-              <button
-                type="submit"
-                className="border border-paper-ink px-4 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-              >
+              <Button variant="primary" className="text-sm">
                 Add domain
-              </button>
+              </Button>
             </form>
 
             {publication?.customDomain ? (
-              <div className="flex flex-wrap items-center gap-3 text-meta-small text-paper-muted">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-paper-muted">
                 <span>
                   Current: {publication.customDomain} (
                   {publication.customDomainVerified ? "verified" : "pending"})
@@ -170,12 +162,9 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                     name="customDomain"
                     value={publication.customDomain}
                   />
-                  <button
-                    type="submit"
-                    className="border border-paper-border px-3 py-2 text-meta-small text-paper-ink transition hover:bg-paper-border"
-                  >
+                  <Button variant="secondary" className="text-sm">
                     Verify domain
-                  </button>
+                  </Button>
                 </form>
 
                 <form action={removeCustomDomain}>
@@ -184,17 +173,14 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                     name="customDomain"
                     value={publication.customDomain}
                   />
-                  <button
-                    type="submit"
-                    className="border border-paper-ink px-3 py-2 text-meta-small text-paper-ink transition hover:bg-paper-ink hover:text-paper-base"
-                  >
+                  <Button variant="danger" className="text-sm">
                     Remove domain
-                  </button>
+                  </Button>
                 </form>
               </div>
             ) : null}
 
-            <p className="text-meta-small text-paper-muted">
+            <p className="text-sm text-paper-muted">
               Configure DNS records from Vercel's response, then use Verify
               domain.
             </p>
