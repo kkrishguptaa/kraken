@@ -1,6 +1,6 @@
 # Kraken
 
-Kraken is an editorial social platform for writing regular updates to friends and subscribers. You write issues on your own cadence, publish them to a public profile or custom domain, and send them by email.
+**Kraken** is a personal publishing platform for staying connected with friends through regular life updates. Share daily notes, weekly letters, or monthly check-ins—your friends receive them predictably via email or feed, without algorithms deciding who sees what. It's social media made calmer, more personal, and more like staying in touch than performing for an audience.
 
 ## Stack
 

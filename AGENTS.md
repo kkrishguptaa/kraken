@@ -199,4 +199,6 @@ When repo-wide drift shows up, prefer fixing the underlying code or automation s
 
 # Product summary
 
-Kraken is an editorial social platform for writing regular updates to friends and subscribers. Users can publish issues, expose them on a public profile, and distribute them by email, with optional custom domain routing.
+Kraken is a personal publishing platform for staying connected with friends through regular life updates. Share daily notes, weekly letters, or monthly check-ins on your own cadence. Your friends receive them predictably via email or a calm feed, without algorithms deciding who sees what. 
+
+The platform maintains an editorial aesthetic (publications, mastheads, issues) as a design choice, but the tone is personal and intimate—like writing letters to friends rather than performing for an audience. It's social media made calmer, more predictable, and more focused on staying caught up with people you care about than competing for attention in an algorithmic feed.
