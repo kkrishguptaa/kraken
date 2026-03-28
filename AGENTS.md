@@ -149,9 +149,8 @@ These are the implemented routes. Prefer matching them unless the task explicitl
 - Follow the current naming and file organization before introducing new abstractions.
 - When editing auth or route behavior, inspect both the page/component layer and the helper/action layer it depends on.
 - When editing public profile or issue rendering, check both:
-  - `src/app/@[username]/page.tsx`
-  - `src/app/~[username]/page.tsx`
-  - `src/app/~[username]/[editionNumber]/page.tsx`
+  - `src/app/[handle]/page.tsx`
+  - `src/app/[handle]/[editionNumber]/page.tsx`
   - Legacy redirect routes under `src/app/@/[username]/**` and `src/app/~/[username]/**`
 - When editing editorial flows, inspect `src/components/editorial/EditorialWorkspace.tsx` and `src/actions/editorial-actions.ts` together.
 - When editing subscriptions or email behavior, inspect both the server actions and the email templates in `src/emails/**`.

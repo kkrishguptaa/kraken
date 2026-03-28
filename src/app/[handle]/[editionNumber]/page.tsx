@@ -10,15 +10,29 @@ import { getIssueByEditionNumber } from "@/lib/queries/updates";
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: Promise<{ username: string; editionNumber: string }>;
+  params: Promise<{ handle: string; editionNumber: string }>;
   searchParams: Promise<{ subscribe?: string }>;
+}
+
+function parsePublicationHandle(rawHandle: string): string | null {
+  if (!rawHandle.startsWith("~") || rawHandle.length < 2) {
+    return null;
+  }
+
+  return rawHandle.slice(1);
 }
 
 export default async function PublicationIssuePage({
   params,
   searchParams,
 }: PageProps) {
-  const { username, editionNumber } = await params;
+  const { handle, editionNumber } = await params;
+  const username = parsePublicationHandle(handle);
+
+  if (!username) {
+    notFound();
+  }
+
   const { subscribe } = await searchParams;
   const normalizedEditionNumber = decodeURIComponent(editionNumber);
   const parsedEditionNumber = Number.parseInt(normalizedEditionNumber, 10);
