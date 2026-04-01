@@ -68,7 +68,7 @@ export async function addProjectDomain(domain: string) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ domain }),
+      body: JSON.stringify({ name: domain }),
     },
   );
 
