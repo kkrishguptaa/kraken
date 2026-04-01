@@ -25,7 +25,9 @@ function toVercelError(
   const message = payload?.error?.message || fallbackMessage;
 
   if (code) {
-    return new Error(`Vercel ${action} failed (${status}, ${code}): ${message}`);
+    return new Error(
+      `Vercel ${action} failed (${status}, ${code}): ${message}`,
+    );
   }
 
   return new Error(`Vercel ${action} failed (${status}): ${message}`);

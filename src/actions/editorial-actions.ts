@@ -13,6 +13,7 @@ import { NewIssueEmail } from "@/emails/new-issue-email";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
 import { getAppUrl, getFromEmail, getResendClient } from "@/lib/resend";
+import { parsePublishDateInput } from "@/lib/utils/publish-date";
 
 export type EditorialIssueRecord = {
   id: string;
@@ -97,24 +98,6 @@ function revalidateEditorialPaths(
   if (editionNumber) {
     revalidatePath(`/~${username}/${editionNumber}`);
   }
-}
-
-function resolvePublishTimestamp(publishedAt?: string): Date {
-  if (!publishedAt) {
-    return new Date();
-  }
-
-  const parsed = new Date(publishedAt);
-
-  if (Number.isNaN(parsed.getTime())) {
-    throw new Error("Publish date is invalid.");
-  }
-
-  if (parsed.getTime() > Date.now()) {
-    throw new Error("Publish date cannot be in the future.");
-  }
-
-  return parsed;
 }
 
 export async function createEditorialDraft(): Promise<EditorialIssueRecord> {
@@ -211,11 +194,11 @@ export async function publishEditorialIssue(input: {
   issueId: string;
   title: string;
   content: string;
-  publishedAt?: string;
+  publishedOn?: string;
 }): Promise<EditorialIssueRecord> {
   const session = await useOnboarded();
   const username = getRequiredUsername(session);
-  const publishTimestamp = resolvePublishTimestamp(input.publishedAt);
+  const publishTimestamp = parsePublishDateInput(input.publishedOn);
 
   // Verify issue exists and belongs to user
   const existingIssue = await db
@@ -301,7 +284,6 @@ export async function publishEditorialIssue(input: {
 
     if (activeSubscribers.length > 0) {
       const appUrl = getAppUrl();
-      const issueUrl = `${appUrl}/~${username}/${published.editionNumber}`;
 
       for (const subscriber of activeSubscribers) {
         const unsubscribeUrl = `${appUrl}/api/subscriptions/unsubscribe/${subscriber.token}`;
@@ -314,8 +296,8 @@ export async function publishEditorialIssue(input: {
             react: jsx(NewIssueEmail, {
               publicationName,
               issueTitle: input.title,
-              issueUrl,
               issueContent: input.content,
+              signOff: publicationName,
               unsubscribeUrl,
             }),
           });
@@ -366,7 +348,6 @@ export async function testSendIssueEmail(input: {
   const publicationName =
     publication?.name || session.user.name || username || "KRAKEN";
   const appUrl = getAppUrl();
-  const issueUrl = `${appUrl}/~${username}`;
 
   await resend.emails.send({
     from: getFromEmail(),
@@ -375,8 +356,8 @@ export async function testSendIssueEmail(input: {
     react: jsx(NewIssueEmail, {
       publicationName,
       issueTitle: input.title,
-      issueUrl,
       issueContent: input.content,
+      signOff: publicationName,
       unsubscribeUrl: `${appUrl}/subscriptions`,
     }),
   });

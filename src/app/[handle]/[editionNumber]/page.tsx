@@ -41,7 +41,18 @@ export default async function PublicationIssuePage({
     notFound();
   }
 
-  const issue = await getIssueByEditionNumber(username, parsedEditionNumber);
+  let session = null;
+  try {
+    session = await getSession();
+  } catch {
+    // If session lookup fails, still render publication publicly.
+  }
+
+  const issue = await getIssueByEditionNumber(
+    username,
+    parsedEditionNumber,
+    session?.user?.id,
+  );
 
   if (!issue) {
     notFound();
@@ -54,29 +65,41 @@ export default async function PublicationIssuePage({
     .where(eq(user.username, username))
     .then((rows) => rows[0]);
 
-  const session = await getSession();
   const publicationTitle =
     publication?.publicationName || issue.publicationName || "KRAKEN";
   const isOwnPublication = session?.user?.username === username;
-  const isSubscribed =
-    !!session?.user?.email && !isOwnPublication
-      ? await isViewerSubscribedToPublication(username, session.user.email)
-      : false;
-  const isFollowing =
-    !!session?.user?.id && !!publication?.ownerId && !isOwnPublication
-      ? Boolean(
-          await db
-            .select({ followerId: follows.followerId })
-            .from(follows)
-            .where(
-              and(
-                eq(follows.followerId, session.user.id),
-                eq(follows.followingId, publication.ownerId),
-              ),
-            )
-            .then((rows) => rows[0]),
-        )
-      : false;
+  let isSubscribed = false;
+  let isFollowing = false;
+
+  if (!!session?.user?.email && !isOwnPublication) {
+    try {
+      isSubscribed = await isViewerSubscribedToPublication(
+        username,
+        session.user.email,
+      );
+    } catch {
+      // Database unavailable, assume not subscribed
+    }
+  }
+
+  if (!!session?.user?.id && !!publication?.ownerId && !isOwnPublication) {
+    try {
+      isFollowing = Boolean(
+        await db
+          .select({ followerId: follows.followerId })
+          .from(follows)
+          .where(
+            and(
+              eq(follows.followerId, session.user.id),
+              eq(follows.followingId, publication.ownerId),
+            ),
+          )
+          .then((rows) => rows[0]),
+      );
+    } catch {
+      // Database unavailable, assume not following
+    }
+  }
 
   return (
     <PublicationIssueView
@@ -87,6 +110,7 @@ export default async function PublicationIssuePage({
       isOwnPublication={isOwnPublication}
       isSubscribed={isSubscribed}
       isFollowing={isFollowing}
+      isAuthenticated={Boolean(session)}
       subscribe={subscribe}
     />
   );

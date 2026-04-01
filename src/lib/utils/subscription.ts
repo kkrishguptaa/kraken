@@ -35,3 +35,32 @@ export function resolveVerifiedSubscriptionUserId(input: {
 
   return input.sessionUserId;
 }
+
+export function doesSessionOwnSubscriber(input: {
+  sessionUserId?: string | null;
+  sessionEmail?: string | null;
+  subscriberUserId?: string | null;
+  subscriberEmail?: string | null;
+}): boolean {
+  if (!input.sessionUserId) {
+    return false;
+  }
+
+  if (
+    input.subscriberUserId &&
+    input.subscriberUserId === input.sessionUserId
+  ) {
+    return true;
+  }
+
+  const normalizedSessionEmail =
+    input.sessionEmail?.trim().toLowerCase() ?? null;
+  const normalizedSubscriberEmail =
+    input.subscriberEmail?.trim().toLowerCase() ?? null;
+
+  return Boolean(
+    normalizedSessionEmail &&
+      normalizedSubscriberEmail &&
+      normalizedSessionEmail === normalizedSubscriberEmail,
+  );
+}

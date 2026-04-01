@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  doesSessionOwnSubscriber,
   isValidEmail,
   normalizeReturnTo,
   resolveVerifiedSubscriptionUserId,
@@ -55,5 +56,37 @@ test("resolveVerifiedSubscriptionUserId only trusts the signed-in user's own ema
       targetEmail: "krish@example.com",
     }),
     null,
+  );
+});
+
+test("doesSessionOwnSubscriber matches by user id or verified email", () => {
+  assert.equal(
+    doesSessionOwnSubscriber({
+      sessionUserId: "user_123",
+      sessionEmail: "krish@example.com",
+      subscriberUserId: "user_123",
+      subscriberEmail: "friend@example.com",
+    }),
+    true,
+  );
+
+  assert.equal(
+    doesSessionOwnSubscriber({
+      sessionUserId: "user_123",
+      sessionEmail: "Krish@Example.com",
+      subscriberUserId: null,
+      subscriberEmail: "krish@example.com",
+    }),
+    true,
+  );
+
+  assert.equal(
+    doesSessionOwnSubscriber({
+      sessionUserId: "user_123",
+      sessionEmail: "krish@example.com",
+      subscriberUserId: null,
+      subscriberEmail: "friend@example.com",
+    }),
+    false,
   );
 });

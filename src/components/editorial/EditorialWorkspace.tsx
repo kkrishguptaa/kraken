@@ -11,23 +11,17 @@ import {
   testSendIssueEmail,
 } from "@/actions/editorial-actions";
 import { Button } from "@/components/ui/button";
+import {
+  formatEditorialDate,
+  toDateOnlyInputValue,
+} from "@/lib/utils/publish-date";
 
 type EditorialWorkspaceProps = {
   username: string;
   initialIssues: EditorialIssueRecord[];
 };
 
-function toLocalDateTimeInputValue(value: Date): string {
-  const year = value.getFullYear();
-  const month = String(value.getMonth() + 1).padStart(2, "0");
-  const day = String(value.getDate()).padStart(2, "0");
-  const hours = String(value.getHours()).padStart(2, "0");
-  const minutes = String(value.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-function formatStamp(value: Date | null): string {
+function formatDateTimeStamp(value: Date | null): string {
   if (!value) {
     return "Never";
   }
@@ -36,6 +30,14 @@ function formatStamp(value: Date | null): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(value);
+}
+
+function formatPublishedStamp(value: Date | null): string {
+  if (!value) {
+    return "Never";
+  }
+
+  return formatEditorialDate(value);
 }
 
 export function EditorialWorkspace({
@@ -48,7 +50,7 @@ export function EditorialWorkspace({
   );
   const [title, setTitle] = useState(initialIssues[0]?.title ?? "");
   const [content, setContent] = useState(initialIssues[0]?.content ?? "");
-  const [publishDateLocal, setPublishDateLocal] = useState("");
+  const [publishDateValue, setPublishDateValue] = useState("");
   const [notice, setNotice] = useState<string>("");
   const [isPending, startTransition] = useTransition();
 
@@ -88,9 +90,9 @@ export function EditorialWorkspace({
     setActiveIssueId(issue.id);
     setTitle(issue.title);
     setContent(issue.content);
-    setPublishDateLocal(
+    setPublishDateValue(
       issue.status === "published" && issue.publishedAt
-        ? toLocalDateTimeInputValue(issue.publishedAt)
+        ? toDateOnlyInputValue(issue.publishedAt)
         : "",
     );
     setNotice("");
@@ -156,26 +158,13 @@ export function EditorialWorkspace({
       return;
     }
 
-    let publishTimestamp: string | undefined;
-
-    if (publishDateLocal) {
-      const parsedLocalDate = new Date(publishDateLocal);
-
-      if (Number.isNaN(parsedLocalDate.getTime())) {
-        setNotice("Publish date is invalid.");
-        return;
-      }
-
-      publishTimestamp = parsedLocalDate.toISOString();
-    }
-
     startTransition(async () => {
       try {
         const published = await publishEditorialIssue({
           issueId: activeIssue.id,
           title: title.trim() || "Untitled Issue",
           content,
-          publishedAt: publishTimestamp,
+          publishedOn: publishDateValue,
         });
 
         setIssues((prev) =>
@@ -270,7 +259,7 @@ export function EditorialWorkspace({
                   {issue.title || "Untitled Issue"}
                 </p>
                 <p className="mt-1 text-sm text-paper-muted">
-                  Published {formatStamp(issue.publishedAt)}
+                  Published {formatPublishedStamp(issue.publishedAt)}
                 </p>
               </button>
             ))
@@ -287,7 +276,7 @@ export function EditorialWorkspace({
                   Edition #{activeIssue.editionNumber}
                 </p>
                 <p className="text-sm text-paper-muted">
-                  Last updated {formatStamp(activeIssue.updatedAt)}
+                  Last updated {formatDateTimeStamp(activeIssue.updatedAt)}
                 </p>
               </div>
               <input
@@ -357,16 +346,17 @@ export function EditorialWorkspace({
                     </label>
                     <input
                       id="publish-date"
-                      type="datetime-local"
-                      value={publishDateLocal}
+                      type="date"
+                      value={publishDateValue}
                       onChange={(event) =>
-                        setPublishDateLocal(event.target.value)
+                        setPublishDateValue(event.target.value)
                       }
                       className="border border-paper-border bg-paper-base px-2 py-1 text-sm text-paper-ink outline-none focus:border-paper-accent"
                       disabled={isPending}
                     />
                     <p className="text-xs text-paper-muted">
-                      Uses your local timezone. Future dates are not allowed.
+                      Leave blank to publish with today&apos;s date. Future
+                      dates are not allowed.
                     </p>
                   </div>
                   <Button

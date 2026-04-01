@@ -1,6 +1,6 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
-import type { Article } from "@/components/editorial";
-import { follows, issues, publications, user } from "@/db/schema";
+import { and, count, desc, eq, inArray, isNull } from "drizzle-orm";
+import type { Article, IssueSocialState } from "@/components/editorial";
+import { follows, issues, likes, publications, user } from "@/db/schema";
 import { db } from "@/lib/db";
 import { calculateReadTime } from "../utils/text";
 
@@ -11,10 +11,89 @@ function isValidUsername(username: string): boolean {
   return /^[a-zA-Z0-9_-]{1,50}$/.test(username);
 }
 
+type ArticleRow = {
+  id: string;
+  title: string;
+  content: string;
+  editionNumber: number;
+  publishedAt: Date | null;
+  publicationName: string | null;
+  userId: string;
+  userUsername: string | null;
+};
+
+async function getIssueSocialState(
+  issueIds: string[],
+  viewerUserId?: string | null,
+): Promise<Map<string, IssueSocialState>> {
+  if (issueIds.length === 0) {
+    return new Map();
+  }
+
+  const [likeCounts, viewerLikes] = await Promise.all([
+    db
+      .select({
+        issueId: likes.issueId,
+        likeCount: count(likes.issueId),
+      })
+      .from(likes)
+      .where(inArray(likes.issueId, issueIds))
+      .groupBy(likes.issueId),
+    viewerUserId
+      ? db
+          .select({ issueId: likes.issueId })
+          .from(likes)
+          .where(
+            and(
+              eq(likes.userId, viewerUserId),
+              inArray(likes.issueId, issueIds),
+            ),
+          )
+      : Promise.resolve([]),
+  ]);
+
+  const countMap = new Map(
+    likeCounts.map((row) => [row.issueId, Number(row.likeCount)]),
+  );
+  const likedIssueIds = new Set(viewerLikes.map((row) => row.issueId));
+
+  return new Map(
+    issueIds.map((issueId) => [
+      issueId,
+      {
+        likeCount: countMap.get(issueId) ?? 0,
+        viewerHasLiked: likedIssueIds.has(issueId),
+      },
+    ]),
+  );
+}
+
+function mapArticleRow(
+  row: ArticleRow,
+  socialState?: IssueSocialState,
+): Article {
+  return {
+    id: row.id,
+    publicationName: row.publicationName || "Untitled Publication",
+    editionNumber: row.editionNumber || 1,
+    headline: row.title,
+    content: row.content,
+    publishedAt: row.publishedAt ?? new Date(),
+    readTime: calculateReadTime(row.content),
+    userId: row.userId,
+    userUsername: row.userUsername || "unknown",
+    likeCount: socialState?.likeCount ?? 0,
+    viewerHasLiked: socialState?.viewerHasLiked ?? false,
+  };
+}
+
 /**
  * Fetch recent published updates for homepage
  */
-export async function getRecentUpdates(limit = 10): Promise<Article[]> {
+export async function getRecentUpdates(
+  limit = 10,
+  viewerUserId?: string | null,
+): Promise<Article[]> {
   const results = await db
     .select({
       id: issues.id,
@@ -33,17 +112,12 @@ export async function getRecentUpdates(limit = 10): Promise<Article[]> {
     .orderBy(desc(issues.publishedAt))
     .limit(limit);
 
-  return results.map((row) => ({
-    id: row.id,
-    publicationName: row.publicationName || "Untitled Publication",
-    editionNumber: row.editionNumber || 1,
-    headline: row.title,
-    content: row.content,
-    publishedAt: row.publishedAt ?? new Date(),
-    readTime: calculateReadTime(row.content),
-    userId: row.userId,
-    userUsername: row.userUsername || "unknown",
-  }));
+  const socialState = await getIssueSocialState(
+    results.map((row) => row.id),
+    viewerUserId,
+  );
+
+  return results.map((row) => mapArticleRow(row, socialState.get(row.id)));
 }
 
 export async function getFeedUpdatesForUser(
@@ -75,17 +149,12 @@ export async function getFeedUpdatesForUser(
     .orderBy(desc(issues.publishedAt))
     .limit(limit);
 
-  return results.map((row) => ({
-    id: row.id,
-    publicationName: row.publicationName || "Untitled Publication",
-    editionNumber: row.editionNumber || 1,
-    headline: row.title,
-    content: row.content,
-    publishedAt: row.publishedAt ?? new Date(),
-    readTime: calculateReadTime(row.content),
-    userId: row.userId,
-    userUsername: row.userUsername || "unknown",
-  }));
+  const socialState = await getIssueSocialState(
+    results.map((row) => row.id),
+    viewerUserId,
+  );
+
+  return results.map((row) => mapArticleRow(row, socialState.get(row.id)));
 }
 
 /**
@@ -94,6 +163,7 @@ export async function getFeedUpdatesForUser(
 export async function getIssuesByUsername(
   username: string,
   limit = 10,
+  viewerUserId?: string | null,
 ): Promise<Article[]> {
   if (!isValidUsername(username)) {
     return [];
@@ -123,17 +193,12 @@ export async function getIssuesByUsername(
     .orderBy(desc(issues.publishedAt))
     .limit(limit);
 
-  return results.map((row) => ({
-    id: row.id,
-    publicationName: row.publicationName || "Untitled Publication",
-    editionNumber: row.editionNumber || 1,
-    headline: row.title,
-    content: row.content,
-    publishedAt: row.publishedAt ?? new Date(),
-    readTime: calculateReadTime(row.content),
-    userId: row.userId,
-    userUsername: row.userUsername || "unknown",
-  }));
+  const socialState = await getIssueSocialState(
+    results.map((row) => row.id),
+    viewerUserId,
+  );
+
+  return results.map((row) => mapArticleRow(row, socialState.get(row.id)));
 }
 
 /**
@@ -142,6 +207,7 @@ export async function getIssuesByUsername(
 export async function getIssueByEditionNumber(
   username: string,
   editionNumber: number,
+  viewerUserId?: string | null,
 ) {
   if (
     !isValidUsername(username) ||
@@ -181,6 +247,9 @@ export async function getIssueByEditionNumber(
     return null;
   }
 
+  const socialState = await getIssueSocialState([result.id], viewerUserId);
+  const issueSocialState = socialState.get(result.id);
+
   return {
     id: result.id,
     publicationName: result.publicationName || "Untitled Publication",
@@ -193,6 +262,8 @@ export async function getIssueByEditionNumber(
     userName: result.userName,
     userUsername: result.userUsername,
     userImage: result.userImage,
+    likeCount: issueSocialState?.likeCount ?? 0,
+    viewerHasLiked: issueSocialState?.viewerHasLiked ?? false,
   };
 }
 

@@ -132,18 +132,7 @@ export async function addCustomDomain(formData: FormData) {
     );
   } catch (error) {
     const detail = getErrorDetail(error);
-
-    await db
-      .update(publications)
-      .set({
-        customDomain: domain,
-        customDomainVerified: false,
-        updatedAt: new Date(),
-      })
-      .where(eq(publications.id, publication.id));
-
-    revalidatePath("/settings");
-    toSettingsRedirect("domain-pending-verification", detail);
+    toSettingsRedirect("domain-add-failed", detail);
   }
 }
 

@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { ArticleCard, EditorialGrid, Masthead } from "@/components/editorial";
+import {
+  ArticleCard,
+  EditorialGrid,
+  IssueLikeControl,
+  Masthead,
+} from "@/components/editorial";
 import { useOnboarded } from "@/hooks/onboarded";
 import { getFeedUpdatesForUser } from "@/lib/queries/updates";
 import { assignCardSizes, getCardGridClasses } from "@/lib/utils/card-layout";
@@ -32,13 +37,35 @@ export default async function FeedPage() {
               const size = cardSizes[index];
               const gridClasses = getCardGridClasses(size);
               return (
-                <Link
-                  key={article.id}
-                  href={`/~${article.userUsername}/${article.editionNumber}`}
-                  className={`${gridClasses} group h-full`}
-                >
-                  <ArticleCard article={article} size={size} />
-                </Link>
+                <div key={article.id} className={`${gridClasses} group h-full`}>
+                  <ArticleCard
+                    article={article}
+                    href={`/~${article.userUsername}/${article.editionNumber}`}
+                    size={size}
+                    socialSlot={
+                      <div className="flex items-center justify-between gap-3">
+                        <Link
+                          href={`/~${article.userUsername}`}
+                          className="text-xs text-paper-muted underline-offset-2 hover:underline"
+                        >
+                          ~{article.userUsername}
+                        </Link>
+                        <IssueLikeControl
+                          issueId={article.id}
+                          publicationUsername={
+                            article.userUsername || "unknown"
+                          }
+                          editionNumber={article.editionNumber}
+                          likeCount={article.likeCount}
+                          viewerHasLiked={article.viewerHasLiked}
+                          isAuthenticated
+                          returnTo="/feed"
+                          compact
+                        />
+                      </div>
+                    }
+                  />
+                </div>
               );
             })}
           </EditorialGrid>

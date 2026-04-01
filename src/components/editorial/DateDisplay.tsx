@@ -9,12 +9,13 @@ interface DateDisplayProps {
 export function DateDisplay({ date, className = "" }: DateDisplayProps) {
   const dateObj = typeof date === "string" ? new Date(date) : date;
 
-  const day = String(dateObj.getDate()).padStart(2, "0");
-  const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-  const year = String(dateObj.getFullYear()).slice(-2);
+  const day = String(dateObj.getUTCDate()).padStart(2, "0");
+  const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+  const year = String(dateObj.getUTCFullYear()).slice(-2);
+  const dateTime = `${dateObj.getUTCFullYear()}-${month}-${day}`;
 
   return (
-    <time dateTime={dateObj.toISOString()} className={`${className}`}>
+    <time dateTime={dateTime} className={`${className}`}>
       {day}/{month}/{year}
     </time>
   );

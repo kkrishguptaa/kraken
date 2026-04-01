@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { desc, eq, or } from "drizzle-orm";
 import {
   removeSubscription,
   subscribeToPublication,
@@ -46,7 +46,7 @@ export default async function SubscriptionsPage({ searchParams }: PageProps) {
     .innerJoin(publications, eq(subscribers.publicationId, publications.id))
     .innerJoin(user, eq(publications.userId, user.id))
     .where(
-      and(
+      or(
         eq(subscribers.userId, session.user.id),
         eq(subscribers.email, session.user.email),
       ),

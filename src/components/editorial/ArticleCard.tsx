@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { MarkdownRender } from "@/lib/utils/markdown";
 import { DateDisplay } from "./DateDisplay";
 
@@ -11,12 +12,20 @@ export interface Article {
   readTime: number;
   userId: string;
   userUsername?: string;
+  likeCount: number;
+  viewerHasLiked: boolean;
 }
 
 export type CardSize = "wide" | "standard" | "tall";
+export type IssueSocialState = {
+  likeCount: number;
+  viewerHasLiked: boolean;
+};
 
 interface ArticleCardProps {
   article: Article;
+  href?: string;
+  socialSlot?: React.ReactNode;
   size?: CardSize;
   className?: string;
 }
@@ -29,17 +38,29 @@ const LINE_CLAMP_CLASS_MAP: Record<CardSize, string> = {
 
 export function ArticleCard({
   article,
+  href,
+  socialSlot,
   size = "standard",
   className = "",
 }: ArticleCardProps) {
   const lineClampClass = LINE_CLAMP_CLASS_MAP[size];
+  const headline = href ? (
+    <Link
+      href={href}
+      className="underline-offset-8 transition group-hover:underline"
+    >
+      {article.headline}
+    </Link>
+  ) : (
+    article.headline
+  );
 
   return (
     <article
       className={`flex h-full flex-col bg-paper-base p-6 lg:p-8 ${className}`}
     >
       <h2 className="text-headline leading-tight text-balance text-paper-ink underline-offset-8 group-hover:underline">
-        {article.headline}
+        {headline}
       </h2>
 
       <div className="my-4 flex justify-end">
@@ -58,6 +79,12 @@ export function ArticleCard({
           {article.content}
         </MarkdownRender>
       </div>
+
+      {socialSlot ? (
+        <div className="mt-4 border-t border-paper-border pt-3">
+          {socialSlot}
+        </div>
+      ) : null}
     </article>
   );
 }

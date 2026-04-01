@@ -1,5 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+function normalizeHostname(value: string): string {
+  return value.trim().toLowerCase().replace(/\.$/, "").split(":")[0] || "";
+}
+
 function getHandleUsername(pathname: string): string | null {
   if (!pathname.startsWith("/@") && !pathname.startsWith("/~")) {
     return null;
@@ -35,8 +39,9 @@ function isPrimaryHost(hostname: string): boolean {
 }
 
 export async function proxy(request: NextRequest) {
-  const hostHeader = request.headers.get("host") || "";
-  const hostname = hostHeader.split(":")[0];
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const hostHeader = request.headers.get("host");
+  const hostname = normalizeHostname(forwardedHost || hostHeader || "");
   const pathname = request.nextUrl.pathname;
 
   if (isPrimaryHost(hostname)) {

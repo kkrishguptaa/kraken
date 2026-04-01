@@ -2,7 +2,12 @@ import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import type { Article } from "@/components/editorial";
-import { ArticleCard, EditorialGrid, Masthead } from "@/components/editorial";
+import {
+  ArticleCard,
+  EditorialGrid,
+  IssueLikeControl,
+  Masthead,
+} from "@/components/editorial";
 import { SubscriptionBox } from "@/components/editorial/SubscriptionBox";
 import { follows, publications, user } from "@/db/schema";
 import { getSession } from "@/hooks/session";
@@ -36,7 +41,10 @@ function parsePublicationHandle(
   return null;
 }
 
-export default async function PublicHandlePage({ params, searchParams }: PageProps) {
+export default async function PublicHandlePage({
+  params,
+  searchParams,
+}: PageProps) {
   const { handle } = await params;
   const parsed = parsePublicationHandle(handle);
 
@@ -89,7 +97,11 @@ export default async function PublicHandlePage({ params, searchParams }: PagePro
   let articles: Article[] = [];
 
   try {
-    articles = await getIssuesByUsername(publicationUsername, 12);
+    articles = await getIssuesByUsername(
+      publicationUsername,
+      12,
+      session?.user?.id,
+    );
   } catch {
     // Database unavailable, show empty list
   }
@@ -166,13 +178,33 @@ export default async function PublicHandlePage({ params, searchParams }: PagePro
               const size = cardSizes[index];
               const gridClasses = getCardGridClasses(size);
               return (
-                <Link
-                  key={article.id}
-                  href={`/~${publicationUsername}/${article.editionNumber}`}
-                  className={`${gridClasses} group h-full`}
-                >
-                  <ArticleCard article={article} size={size} />
-                </Link>
+                <div key={article.id} className={`${gridClasses} group h-full`}>
+                  <ArticleCard
+                    article={article}
+                    href={`/~${publicationUsername}/${article.editionNumber}`}
+                    size={size}
+                    socialSlot={
+                      <div className="flex items-center justify-between gap-3">
+                        <Link
+                          href={`/~${publicationUsername}/${article.editionNumber}`}
+                          className="text-xs text-paper-muted underline-offset-2 hover:underline"
+                        >
+                          Read edition
+                        </Link>
+                        <IssueLikeControl
+                          issueId={article.id}
+                          publicationUsername={publicationUsername}
+                          editionNumber={article.editionNumber}
+                          likeCount={article.likeCount}
+                          viewerHasLiked={article.viewerHasLiked}
+                          isAuthenticated={Boolean(session)}
+                          returnTo={`/~${publicationUsername}`}
+                          compact
+                        />
+                      </div>
+                    }
+                  />
+                </div>
               );
             })}
           </EditorialGrid>

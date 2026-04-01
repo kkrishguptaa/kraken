@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { jsx } from "react/jsx-runtime";
@@ -12,6 +12,7 @@ import { getSession } from "@/hooks/session";
 import { db } from "@/lib/db";
 import { getAppUrl, getFromEmail, getResendClient } from "@/lib/resend";
 import {
+  doesSessionOwnSubscriber,
   isValidEmail,
   normalizeReturnTo,
   resolveVerifiedSubscriptionUserId,
@@ -331,11 +332,17 @@ export async function updateSubscriptionNotifications(formData: FormData) {
 
   await db
     .update(subscribers)
-    .set({ emailNotificationsEnabled: enabled })
+    .set({
+      emailNotificationsEnabled: enabled,
+      userId: session.user.id,
+    })
     .where(
       and(
         eq(subscribers.id, subscriberId),
-        eq(subscribers.userId, session.user.id),
+        or(
+          eq(subscribers.userId, session.user.id),
+          eq(subscribers.email, session.user.email),
+        ),
       ),
     );
 
@@ -355,17 +362,23 @@ export async function removeSubscription(formData: FormData) {
   const existing = await db
     .select({
       id: subscribers.id,
+      email: subscribers.email,
+      userId: subscribers.userId,
       publicationOwnerId: publications.userId,
     })
     .from(subscribers)
     .innerJoin(publications, eq(subscribers.publicationId, publications.id))
-    .where(
-      and(
-        eq(subscribers.id, subscriberId),
-        eq(subscribers.userId, session.user.id),
+    .where(eq(subscribers.id, subscriberId))
+    .then((rows) =>
+      rows.find((row) =>
+        doesSessionOwnSubscriber({
+          sessionUserId: session.user.id,
+          sessionEmail: session.user.email,
+          subscriberUserId: row.userId,
+          subscriberEmail: row.email,
+        }),
       ),
-    )
-    .then((rows) => rows[0]);
+    );
 
   if (!existing) {
     redirect("/subscriptions?status=invalid-subscriber");

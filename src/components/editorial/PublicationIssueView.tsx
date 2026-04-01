@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Masthead } from "@/components/editorial";
 import { DateDisplay } from "@/components/editorial/DateDisplay";
+import { IssueLikeControl } from "@/components/editorial/IssueLikeControl";
 import { SubscriptionBox } from "@/components/editorial/SubscriptionBox";
 import { MarkdownRender } from "@/lib/utils/markdown";
 
@@ -14,12 +15,16 @@ interface SessionLike {
 }
 
 interface IssueViewData {
+  id: string;
+  editionNumber: number;
   headline: string;
   content: string;
   publishedAt: Date | string;
   readTime: number;
   userName?: string | null;
   userUsername?: string | null;
+  likeCount: number;
+  viewerHasLiked: boolean;
 }
 
 interface PublicationIssueViewProps {
@@ -30,6 +35,7 @@ interface PublicationIssueViewProps {
   isOwnPublication: boolean;
   isSubscribed: boolean;
   isFollowing: boolean;
+  isAuthenticated: boolean;
   subscribe?: string;
 }
 
@@ -41,6 +47,7 @@ export function PublicationIssueView({
   isOwnPublication,
   isSubscribed,
   isFollowing,
+  isAuthenticated,
   subscribe,
 }: PublicationIssueViewProps) {
   const publishedDate =
@@ -88,6 +95,18 @@ export function PublicationIssueView({
                   <DateDisplay
                     date={publishedDate}
                     className="text-paper-muted"
+                  />
+                </div>
+
+                <div className="mt-5">
+                  <IssueLikeControl
+                    issueId={issue.id}
+                    publicationUsername={username}
+                    editionNumber={issue.editionNumber}
+                    likeCount={issue.likeCount}
+                    viewerHasLiked={issue.viewerHasLiked}
+                    isAuthenticated={isAuthenticated}
+                    returnTo={`/~${username}/${issue.editionNumber}`}
                   />
                 </div>
               </div>

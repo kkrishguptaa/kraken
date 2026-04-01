@@ -25,6 +25,8 @@ const statusCopy: Record<string, string> = {
   "domain-added": "Custom domain added and verified.",
   "domain-pending-verification":
     "Domain saved. Configure DNS records below, wait for propagation, then click Verify.",
+  "domain-add-failed":
+    "Could not add the domain on Vercel. Nothing was saved locally.",
   "domain-verified": "Domain verified successfully.",
   "domain-removed": "Custom domain removed.",
   "domain-verify-failed": "Could not verify domain yet.",
@@ -220,7 +222,11 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                       name="customDomain"
                       value={publication.customDomain}
                     />
-                    <Button type="submit" variant="secondary" className="text-sm">
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      className="text-sm"
+                    >
                       Verify domain
                     </Button>
                   </form>
@@ -246,15 +252,25 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                       <table className="min-w-full border border-paper-border text-left text-meta-small text-paper-ink">
                         <thead className="bg-white/60">
                           <tr>
-                            <th className="border-b border-paper-border px-3 py-2">Type</th>
-                            <th className="border-b border-paper-border px-3 py-2">Host</th>
-                            <th className="border-b border-paper-border px-3 py-2">Value</th>
-                            <th className="border-b border-paper-border px-3 py-2">Notes</th>
+                            <th className="border-b border-paper-border px-3 py-2">
+                              Type
+                            </th>
+                            <th className="border-b border-paper-border px-3 py-2">
+                              Host
+                            </th>
+                            <th className="border-b border-paper-border px-3 py-2">
+                              Value
+                            </th>
+                            <th className="border-b border-paper-border px-3 py-2">
+                              Notes
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {verificationRecords.map((record, index) => (
-                            <tr key={`${record.type || "record"}-${record.domain || index}`}>
+                            <tr
+                              key={`${record.type || "record"}-${record.domain || index}`}
+                            >
                               <td className="border-b border-paper-border px-3 py-2">
                                 {record.type || "-"}
                               </td>
@@ -273,12 +289,15 @@ export default async function SettingsPage({ searchParams }: PageProps) {
                       </table>
                     </div>
                     <p>
-                      After saving DNS records at your DNS provider, allow propagation
-                      and click <span className="text-paper-ink">Verify domain</span>.
+                      After saving DNS records at your DNS provider, allow
+                      propagation and click{" "}
+                      <span className="text-paper-ink">Verify domain</span>.
                     </p>
                     {verificationLookupError ? (
                       <p className="border-t border-paper-border pt-2 text-paper-muted">
-                        <span className="text-paper-ink">Latest Vercel response:</span>{" "}
+                        <span className="text-paper-ink">
+                          Latest Vercel response:
+                        </span>{" "}
                         {verificationLookupError}
                       </p>
                     ) : null}

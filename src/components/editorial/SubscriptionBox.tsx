@@ -69,7 +69,10 @@ export function SubscriptionBox({
               value={publicationUsername}
             />
             <input type="hidden" name="returnTo" value={returnTo} />
-            <Button variant={isFollowing ? "secondary" : "primary"} className="text-sm">
+            <Button
+              variant={isFollowing ? "secondary" : "primary"}
+              className="text-sm"
+            >
               {isFollowing
                 ? `Following ~${publicationUsername}`
                 : `Follow ~${publicationUsername}`}

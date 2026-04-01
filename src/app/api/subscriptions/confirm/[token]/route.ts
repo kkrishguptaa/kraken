@@ -2,11 +2,13 @@ import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { publications, subscribers, user } from "@/db/schema";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getAppUrl } from "@/lib/resend";
+import { resolveVerifiedSubscriptionUserId } from "@/lib/utils/subscription";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ token: string }> },
 ) {
   const { token } = await context.params;
@@ -14,6 +16,7 @@ export async function GET(
   const subscriber = await db
     .select({
       id: subscribers.id,
+      email: subscribers.email,
       publicationUsername: user.username,
     })
     .from(subscribers)
@@ -29,9 +32,21 @@ export async function GET(
     });
   }
 
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+  const resolvedUserId = resolveVerifiedSubscriptionUserId({
+    sessionUserId: session?.user?.id,
+    sessionEmail: session?.user?.email,
+    targetEmail: subscriber.email,
+  });
+
   await db
     .update(subscribers)
-    .set({ emailNotificationsEnabled: true })
+    .set({
+      emailNotificationsEnabled: true,
+      userId: resolvedUserId ?? undefined,
+    })
     .where(eq(subscribers.id, subscriber.id));
 
   const appUrl = getAppUrl();
