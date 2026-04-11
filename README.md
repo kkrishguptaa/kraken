@@ -33,9 +33,12 @@ Open `http://localhost:3000` to view the app.
 
 ## Main Routes
 
--  - `/@username` for the profile-style public view.
--  - `/~username` for the publication-style view with subscription controls.
--  - `/~username/[editionNumber]` for the publication-style issue view.
+- `/@username` — redirects to `/~username` (compact profile alias).
+- `/~username` — publication home with subscription controls (canonical).
+- `/~username/[editionNumber]` — individual published issue.
+- `/editorial` — writer workspace (no active issue pre-selected).
+- `/editorial/[id]` — writer workspace focused on a specific issue.
+- `/feed` — tabbed reader feed: Articles, Subscriptions, Follows, and Likes.
 
 For a compact route map and notes on the public/domain routing split, see [docs/routes.md](docs/routes.md).
 
@@ -67,6 +70,8 @@ The code currently expects some combination of the following values:
 - `VERCEL_API_TOKEN`
 - `VERCEL_PROJECT_ID`
 - `VERCEL_TEAM_ID`
+- `UPSTASH_REDIS_REST_URL` *(optional — enables proxy domain-lookup caching)*
+- `UPSTASH_REDIS_REST_TOKEN` *(optional — required when `UPSTASH_REDIS_REST_URL` is set)*
 - `TEST_EMAIL_TO`
 
 Some email and domain paths intentionally no-op or degrade gracefully when configuration is missing. Check the implementation before changing those behaviors.

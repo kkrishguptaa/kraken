@@ -8,6 +8,7 @@ import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
 import { getRedisClient } from "@/lib/redis";
 import { normalizeDomain } from "@/lib/utils/domain";
+import { publicationUrl } from "@/lib/utils/routes";
 import {
   addProjectDomain,
   removeProjectDomain,
@@ -82,7 +83,9 @@ export async function updateDisplayName(formData: FormData) {
     .where(eq(user.id, session.user.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/~${session.user.username}`);
+  if (session.user.username) {
+    revalidatePath(publicationUrl(session.user.username));
+  }
   toSettingsRedirect("name-updated");
 }
 
@@ -106,7 +109,9 @@ export async function updatePublicationTitle(formData: FormData) {
     .where(eq(publications.id, publication.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/~${session.user.username}`);
+  if (session.user.username) {
+    revalidatePath(publicationUrl(session.user.username));
+  }
   toSettingsRedirect("publication-title-updated");
 }
 
