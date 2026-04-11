@@ -6,12 +6,24 @@ import { redirect } from "next/navigation";
 import { publications, user } from "@/db/schema";
 import { useOnboarded } from "@/hooks/onboarded";
 import { db } from "@/lib/db";
+import { getRedisClient } from "@/lib/redis";
 import { normalizeDomain } from "@/lib/utils/domain";
+import { publicationUrl } from "@/lib/utils/routes";
 import {
   addProjectDomain,
   removeProjectDomain,
   verifyProjectDomain,
 } from "@/lib/vercel-domains";
+
+async function invalidateDomainCache(domain: string) {
+  const redis = getRedisClient();
+  if (!redis) return;
+  try {
+    await redis.del(`domain:${domain}`);
+  } catch {
+    // Ignore cache invalidation failures
+  }
+}
 
 function getErrorDetail(error: unknown): string | null {
   if (error instanceof Error) {
@@ -71,7 +83,9 @@ export async function updateDisplayName(formData: FormData) {
     .where(eq(user.id, session.user.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/~${session.user.username}`);
+  if (session.user.username) {
+    revalidatePath(publicationUrl(session.user.username));
+  }
   toSettingsRedirect("name-updated");
 }
 
@@ -95,7 +109,9 @@ export async function updatePublicationTitle(formData: FormData) {
     .where(eq(publications.id, publication.id));
 
   revalidatePath("/settings");
-  revalidatePath(`/~${session.user.username}`);
+  if (session.user.username) {
+    revalidatePath(publicationUrl(session.user.username));
+  }
   toSettingsRedirect("publication-title-updated");
 }
 
@@ -127,6 +143,7 @@ export async function addCustomDomain(formData: FormData) {
       .where(eq(publications.id, publication.id));
 
     revalidatePath("/settings");
+    await invalidateDomainCache(domain);
     toSettingsRedirect(
       result.verified ? "domain-added" : "domain-pending-verification",
     );
@@ -164,6 +181,7 @@ export async function verifyCustomDomain(formData: FormData) {
       );
 
     revalidatePath("/settings");
+    await invalidateDomainCache(domain);
     toSettingsRedirect(
       result.verified ? "domain-verified" : "domain-pending-verification",
     );
@@ -204,5 +222,6 @@ export async function removeCustomDomain(formData: FormData) {
     );
 
   revalidatePath("/settings");
+  await invalidateDomainCache(domain);
   toSettingsRedirect("domain-removed");
 }

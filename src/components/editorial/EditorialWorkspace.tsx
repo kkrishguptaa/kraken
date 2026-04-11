@@ -2,6 +2,7 @@
 
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import {
   createEditorialDraft,
@@ -15,10 +16,12 @@ import {
   formatEditorialDate,
   toDateOnlyInputValue,
 } from "@/lib/utils/publish-date";
+import { editorialUrl, issueUrl } from "@/lib/utils/routes";
 
 type EditorialWorkspaceProps = {
   username: string;
   initialIssues: EditorialIssueRecord[];
+  initialActiveIssueId?: string | null;
 };
 
 function formatDateTimeStamp(value: Date | null): string {
@@ -43,16 +46,29 @@ function formatPublishedStamp(value: Date | null): string {
 export function EditorialWorkspace({
   username,
   initialIssues,
+  initialActiveIssueId,
 }: EditorialWorkspaceProps) {
+  const initialIssue = initialActiveIssueId
+    ? (initialIssues.find((i) => i.id === initialActiveIssueId) ??
+      initialIssues[0] ??
+      null)
+    : (initialIssues[0] ?? null);
+
   const [issues, setIssues] = useState(initialIssues);
   const [activeIssueId, setActiveIssueId] = useState<string | null>(
-    initialIssues[0]?.id ?? null,
+    initialIssue?.id ?? null,
   );
-  const [title, setTitle] = useState(initialIssues[0]?.title ?? "");
-  const [content, setContent] = useState(initialIssues[0]?.content ?? "");
-  const [publishDateValue, setPublishDateValue] = useState("");
+  const [title, setTitle] = useState(initialIssue?.title ?? "");
+  const [content, setContent] = useState(initialIssue?.content ?? "");
+  const [publishDateValue, setPublishDateValue] = useState(
+    initialIssue?.status === "published" && initialIssue?.publishedAt
+      ? toDateOnlyInputValue(initialIssue.publishedAt)
+      : "",
+  );
   const [notice, setNotice] = useState<string>("");
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   const activeIssue = useMemo(
     () => issues.find((issue) => issue.id === activeIssueId) ?? null,
@@ -105,6 +121,7 @@ export function EditorialWorkspace({
         setIssues((prev) => [created, ...prev]);
         selectIssue(created);
         setNotice("New draft created.");
+        router.push(editorialUrl(created.id));
       } catch {
         setNotice("Could not create draft.");
       }
@@ -218,11 +235,10 @@ export function EditorialWorkspace({
             <p className="text-sm text-paper-muted">No drafts yet.</p>
           ) : (
             draftIssues.map((issue) => (
-              <button
+              <Link
                 key={issue.id}
-                type="button"
-                onClick={() => selectIssue(issue)}
-                className={`w-full border px-3 py-2 text-left transition ${
+                href={editorialUrl(issue.id)}
+                className={`block w-full border px-3 py-2 text-left transition ${
                   issue.id === activeIssueId
                     ? "border-paper-ink bg-paper-border/50"
                     : "border-paper-border hover:bg-paper-border/40"
@@ -234,7 +250,7 @@ export function EditorialWorkspace({
                 <p className="mt-1 text-sm text-paper-muted">
                   Ed. #{issue.editionNumber}
                 </p>
-              </button>
+              </Link>
             ))
           )}
         </div>
@@ -245,11 +261,10 @@ export function EditorialWorkspace({
             <p className="text-sm text-paper-muted">Nothing published yet.</p>
           ) : (
             publishedIssues.map((issue) => (
-              <button
+              <Link
                 key={issue.id}
-                type="button"
-                onClick={() => selectIssue(issue)}
-                className={`w-full border px-3 py-2 text-left transition ${
+                href={editorialUrl(issue.id)}
+                className={`block w-full border px-3 py-2 text-left transition ${
                   issue.id === activeIssueId
                     ? "border-paper-ink bg-paper-border/50"
                     : "border-paper-border hover:bg-paper-border/40"
@@ -261,7 +276,7 @@ export function EditorialWorkspace({
                 <p className="mt-1 text-sm text-paper-muted">
                   Published {formatPublishedStamp(issue.publishedAt)}
                 </p>
-              </button>
+              </Link>
             ))
           )}
         </div>
@@ -374,7 +389,7 @@ export function EditorialWorkspace({
 
               {activeIssue.status === "published" ? (
                 <Link
-                  href={`/~${username}/${activeIssue.editionNumber}`}
+                  href={issueUrl(username, activeIssue.editionNumber)}
                   className="text-sm underline underline-offset-2"
                 >
                   View published page
